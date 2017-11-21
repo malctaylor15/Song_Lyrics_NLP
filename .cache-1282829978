@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 {"access_token": "BQBZgRKge7lyiZAPVXDdWX6ZFr_cyoOXYhS8X7TAz_jSIOT-x7WBD-EpL86dE0KMQuMj2DKCZzcBJ2varEdZlsUkanOcPRMZPkzyFIPIepQPHtTTj-sC5xOD2T2Or6rMN0quH7j0u-v_XIFbdV4g9xaTzpxIYcAgTeBq-To", "token_type": "Bearer", "expires_in": 3600, "scope": "playlist-read-private user-library-read user-top-read", "expires_at": 1511227207, "refresh_token": "AQB3LdPzCg7qtfhotJNkmiIV42-YSy2sG0eQCcutoJoVXrzrHpbw5yHgDQ_VVul0zHZNVzhSW1JfiWVVM0Dkn5fS4cV7RVYMeAcKFNQt2Cjwa3h4x05T8JCiSAHMTKm1F88"}
+=======
+{"scope": "playlist-read-private user-library-read user-top-read", "access_token": "BQDiL9FiFKmtS4Y7jubmEJpdh2WJW1o0Y_Xr-bXnFdvCl_IQgOm6lFsrHeU1KhzNxQNa0eUZ9ZBAM_chV4cHJEda8e4WisP_ubQ4E92E_OU_zpicvMcR2EX4yRPcXGKZcEsCvDfqw8mOwWidVOytrjAQEOhAz81Wgxq7AeQ", "expires_at": 1510722290, "refresh_token": "AQB3LdPzCg7qtfhotJNkmiIV42-YSy2sG0eQCcutoJoVXrzrHpbw5yHgDQ_VVul0zHZNVzhSW1JfiWVVM0Dkn5fS4cV7RVYMeAcKFNQt2Cjwa3h4x05T8JCiSAHMTKm1F88", "token_type": "Bearer", "expires_in": 3600}
+>>>>>>> Malcolm_dev
