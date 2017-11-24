@@ -22,16 +22,16 @@ os.environ['SPOTIPY_REDIRECT_URI'] = "http://localhost/"
 # In[2]:
 
 def get_tracklist(tracklist_id, username):
-    kittens = {}
+    allTracks = {}
     results = sp.user_playlist(username, tracklist_id, fields="tracks")
     tracks = results['tracks']
     for i, item in enumerate(tracks['items']):
         track = item['track']
         trackName = track['name'] 
         trackArtist = track['artists'][0]['name']
-        kittens[trackName] = trackArtist
-    pp(kittens)
-    return kittens
+        allTracks[trackName] = trackArtist
+    pp(allTracks)
+    return allTracks
 
 
 # In[3]:
@@ -61,7 +61,7 @@ def get_user_playlists(username):
 
 # In[5]:
 
-username = '1282829978'  
+username = '1282829978'  #TODO: Make user input
 scope = 'user-library-read playlist-read-private user-top-read'
 token = util.prompt_for_user_token(username,scope)
 sp = spotipy.Spotify(auth=token)
@@ -251,5 +251,4 @@ else:
     print("Usage: %s username" % (sys.argv[0],))
     sys.exit()'''
 token = util.prompt_for_user_token(username,scope)#client_id='d3c68e4eb95942fb9a0ceb508d62c127',client_secret='bab6935eaa2f478ea4c47a6c8a96eec8',redirect_uri='http://localhost/')
-
 

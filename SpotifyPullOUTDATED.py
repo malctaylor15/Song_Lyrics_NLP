@@ -25,7 +25,7 @@ def get_tracks(username):
     import spotipy.util as util
 
     scope = 'user-library-read playlist-read-private user-top-read'
-    #username = '1282829978'
+    username = '1282829978'
 
     token = util.prompt_for_user_token(username,scope)#client_id='d3c68e4eb95942fb9a0ceb508d62c127',client_secret='bab6935eaa2f478ea4c47a6c8a96eec8',redirect_uri='http://localhost/')
     
