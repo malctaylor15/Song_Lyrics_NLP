@@ -22,13 +22,6 @@ os.environ['SPOTIPY_REDIRECT_URI'] = "http://localhost/"
 import gensim
 import re 
 
-articles_tokens=[]
-for i in range(len(df["text"])):
-    articles_tokens.append([word for word in word_tokenize(str(df["text"][i].lower())) if len(word)>2])
-    model = gensim.models.Word2Vec(articles_tokens, min_count=5,size=100,workers=4)
-model.wv.most_similar("lula")
-
-
     
 # ## Functions
 
@@ -121,7 +114,7 @@ class song:
         self.artist = artist
         self.lyrics = get_song_lyrics(self.artist, self.title, headers = headers)
         self.wc = WordCloud().generate(self.lyrics)
-    def showWordCloud(self)
+    def showWordCloud(self):
         self.wc.to_image().show()
 
 
@@ -143,33 +136,8 @@ inst1 = song('Just What I Am', 'Kid Cudi' )
 
 # In[ ]:
 
-inst1.wc.show()
+image = inst1.showWordCloud().to_image()
 
-
-# In[ ]:
-
-inst1.wc.
-
-
-# In[ ]:
-
-image = wc.to_image()
-
-
-# In[ ]:
-
-image.show()
-
-
-# In[ ]:
-
-# results = sp.user_playlist(username, playlist['id'], fields="tracks")
-
-# Track name 
-# results["tracks"]["items"][0]["track"]["name"]
-
-# Artist 
-# results["tracks"]["items"][0]["track"]["artists"][0]["name"]
 
 
 # In[ ]:
