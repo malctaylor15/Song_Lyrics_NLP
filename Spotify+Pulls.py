@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 import os
 from os import environ
@@ -10,16 +10,29 @@ import sys
 from pprint import pprint as pp
 import spotipy
 import spotipy.util as util
-
+from wordcloud import WordCloud
 # Set environment variables 
 os.environ['SPOTIPY_CLIENT_ID'] = "d3c68e4eb95942fb9a0ceb508d62c127"
 os.environ['SPOTIPY_CLIENT_SECRET'] = "bab6935eaa2f478ea4c47a6c8a96eec8"
 os.environ['SPOTIPY_REDIRECT_URI'] = "http://localhost/"
 
 
+# In[ ]:
+
+import gensim
+import re 
+
+articles_tokens=[]
+for i in range(len(df["text"])):
+    articles_tokens.append([word for word in word_tokenize(str(df["text"][i].lower())) if len(word)>2])
+    model = gensim.models.Word2Vec(articles_tokens, min_count=5,size=100,workers=4)
+model.wv.most_similar("lula")
+
+
+    
 # ## Functions
 
-# In[2]:
+# In[ ]:
 
 def get_tracklist(tracklist_id, username):
     allTracks = {}
@@ -34,16 +47,16 @@ def get_tracklist(tracklist_id, username):
     return allTracks
 
 
-# In[3]:
+# In[ ]:
 
 def get_user_playlists_2(username):
-    all_playlist_info = [[playlist["name"], playlist['tracks']['total'], playlist['id']]
+    all_playlist_info = [[playlist["name"], playlist['tracks']['total'], playlist['id']] 
                          for playlist in playlists['items'] 
                          if playlist['owner']['id'] == username]
     return(all_playlist_info)
 
 
-# In[4]:
+# In[ ]:
 
 def get_user_playlists(username): 
     
@@ -59,7 +72,7 @@ def get_user_playlists(username):
 
 # ## Let's get it running 
 
-# In[5]:
+# In[ ]:
 
 username = '1282829978'  #TODO: Make user input
 scope = 'user-library-read playlist-read-private user-top-read'
@@ -68,19 +81,19 @@ sp = spotipy.Spotify(auth=token)
 playlists = sp.user_playlists(username)
 
 
-# In[6]:
+# In[ ]:
 
-playlist_info = get_user_playlists_2(username)
+playlists_info = get_user_playlists_2(username)
 playlist_index = 2
-tracklist = get_tracklist(playlist_info[playlist_index][2], username)
+tracklist = get_tracklist(playlists_info[2][playlist_index], username)
 
 
-# In[7]:
+# In[ ]:
 
-playlist_info
+playlists_info
 
 
-# In[8]:
+# In[ ]:
 
 # The location of genius API_MT
 sys.path.append('/Users/board/Desktop/Kaggle/Song_Lyrics_NLP')
@@ -88,31 +101,64 @@ from GeniusAPI_MT import *
 #from GeniusAPI_MT import *
 
 
-# In[9]:
+# In[ ]:
 
 lyrics_dict = {}
 for song_name, artist in tracklist.items():
     lyrics_dict[song_name] = get_song_lyrics(artist_name=artist, song_title=song_name, headers=headers)
 
 
-# In[10]:
+# In[ ]:
 
 lyrics_dict
 
 
 # In[ ]:
 
-
+class song: 
+    def __init__(self, title, artist):
+        self.title = title
+        self.artist = artist
+        self.lyrics = get_song_lyrics(self.artist, self.title, headers = headers)
+        self.wc = WordCloud().generate(self.lyrics)
+    def showWordCloud(self)
+        self.wc.to_image().show()
 
 
 # In[ ]:
 
+class playlist:
+    def __init__(self, playlist_name, list_of_songs):
+        self.playlist_name = playlist_name
+        self.list_of_songs = songs
+
+        
+    
 
 
+# In[ ]:
 
-# In[11]:
+inst1 = song('Just What I Am', 'Kid Cudi' )
 
 
+# In[ ]:
+
+inst1.wc.show()
+
+
+# In[ ]:
+
+inst1.wc.
+
+
+# In[ ]:
+
+image = wc.to_image()
+
+
+# In[ ]:
+
+image.show()
 
 
 # In[ ]:
