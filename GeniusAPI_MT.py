@@ -84,7 +84,7 @@ def get_song_lyrics(artist_name, song_title, headers):
         return(cleaned_lyrics)
     else:
         print("Did not find Artist: ", artist_name, " Song: ", song_title, " combination.")
-        return() 
+        return(' ') 
 
 
 # In[5]:

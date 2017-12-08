@@ -39,6 +39,17 @@ def get_tracklist(tracklist_id, username):
     pp(allTracks)
     return allTracks
 
+# In[ ]:
+
+def get_tracklist_class(tracklist_id, username):
+    allTracks = []
+    results = sp.user_playlist(username, tracklist_id, fields="tracks")
+    tracks = results['tracks']
+    for i, item in enumerate(tracks['items']):
+        track = item['track']
+        song_temp = song(track['name'], track['artists'][0]['name'])
+        allTracks.append(song_temp)
+    return allTracks
 
 # In[ ]:
 
@@ -62,9 +73,16 @@ def get_user_playlists(username):
                 fields="tracks,next")
             tracks = results['tracks']
 
+# In[]:
+def get_tracklist_lyrics(tracklist):
+    lyrics = str()
+    for song in tracklist:
+        if song.lyrics != ():
+            lyrics = lyrics + song.lyrics
+    return(lyrics)
+
 
 # ## Let's get it running 
-
 # In[ ]:
 
 username = '1282829978'  #TODO: Make user input
@@ -76,8 +94,10 @@ playlists = sp.user_playlists(username)
 
 # In[ ]:
 playlists_info = get_user_playlists_2(username)
+pp(playlists_info)
+# In[ ]:
 playlist_index = 2
-tracklist = get_tracklist(playlists_info[2][playlist_index], username)
+tracklist = get_tracklist(playlists_info[playlist_index][2], username)
 
 # In[ ]:
 
@@ -106,17 +126,26 @@ class song:
         self.title = title
         self.artist = artist
         self.lyrics = get_song_lyrics(self.artist, self.title, headers = headers)
-        self.wc = WordCloud().generate(self.lyrics)
     def showWordCloud(self):
+        if self.lyrics == ():
+            print("No lyrics found")
+            return ()
+        self.wc = WordCloud().generate(self.lyrics)
         self.wc.to_image().show()
 
 
 # In[ ]:
 
 class playlist:
-    def __init__(self, playlist_name, list_of_songs):
-        self.playlist_name = playlist_name
-        self.list_of_songs = songs
+    def __init__(self, tracklist_id, username):
+        self.username = username
+        self.tracklist_id = tracklist_id
+        self.tracklist = get_tracklist_class(self.tracklist_id, self.username)
+        self.allLyrics = get_tracklist_lyrics(self.tracklist)
+    def showWordCloud(self):
+        self.wc = WordCloud().generate(self.allLyrics)
+        self.wc.to_image().show()
+        
 
         
     
@@ -129,7 +158,25 @@ inst1 = song('500 Benz', 'Joey Bada$$' )
 
 # In[ ]:
 
-inst1.showWordCloud().show
+inst1.showWordCloud()
 
 # In[ ]:
     
+Playlist1 = playlist(playlists_info[playlist_index][2], username)
+
+# In[ ]:
+Playlist1.showWordCloud().show()
+
+# In[]:
+demo = Playlist1.tracklist[4]
+print(demo.lyrics)
+wc = WordCloud().process_text(demo.lyrics)  
+print(wc)
+
+
+# In[]:
+print(len(Playlist1.allLyrics))
+print(len(demo.lyrics))
+
+
+# In[]:
