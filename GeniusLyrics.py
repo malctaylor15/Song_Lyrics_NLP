@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon Nov 13 20:30:13 2017
+Small change for github notice 
 
 @author: drose
 """
