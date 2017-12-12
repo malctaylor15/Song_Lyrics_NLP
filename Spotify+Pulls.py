@@ -7,10 +7,13 @@ import os
 from os import environ
 import subprocess
 import sys
+
 from pprint import pprint as pp
 import spotipy
 import spotipy.util as util
 from wordcloud import WordCloud
+from textblob import TextBlob
+
 # Set environment variables 
 os.environ['SPOTIPY_CLIENT_ID'] = "d3c68e4eb95942fb9a0ceb508d62c127"
 os.environ['SPOTIPY_CLIENT_SECRET'] = "bab6935eaa2f478ea4c47a6c8a96eec8"
@@ -102,7 +105,9 @@ tracklist = get_tracklist(playlists_info[playlist_index][2], username)
 # In[ ]:
 
 # The location of genius API_MT
-sys.path.append('/Users/board/Desktop/Kaggle/Song_Lyrics_NLP')
+#sys.path.append('/Users/board/Desktop/Kaggle/Song_Lyrics_NLP')
+currentDirectory = os.getcwd()
+sys.path.append(currentDirectory)
 from GeniusAPI_MT import *
 #from GeniusAPI_MT import *
 
@@ -126,13 +131,19 @@ class song:
         self.title = title
         self.artist = artist
         self.lyrics = get_song_lyrics(self.artist, self.title, headers = headers)
+        self.blob = TextBlob(self.lyrics) #initialize the object for TextBlob
     def showWordCloud(self):
         if self.lyrics == ():
             print("No lyrics found")
             return ()
         self.wc = WordCloud().generate(self.lyrics)
         self.wc.to_image().show()
-
+    def getSentiment(self):
+        self.polarity = self.blob.sentiment.polarity
+    def getTags(self):
+        print(self.blob.tags)
+    def getNouns(self):
+        print(self.blob.noun_phrases)
 
 # In[ ]:
 
@@ -152,20 +163,25 @@ class playlist:
 
 
 # In[ ]:
-
-inst1 = song('500 Benz', 'Joey Bada$$' )
-
+        
+### Testing the object functionality
+testSong = song('Rap God', 'Eminem')
+testSong.getSentiment()
+testSong.getTags()
+testSong.getNouns()
+print(testSong.polarity)
+pp(testSong.lyrics)
 
 # In[ ]:
 
-inst1.showWordCloud()
+testSong.showWordCloud()
 
 # In[ ]:
     
-Playlist1 = playlist(playlists_info[playlist_index][2], username)
+"""Playlist1 = playlist(playlists_info[playlist_index][2], username)
 
 # In[ ]:
-Playlist1.showWordCloud().show()
+Playlist1.showWordCloud()
 
 # In[]:
 demo = Playlist1.tracklist[4]
@@ -175,8 +191,10 @@ print(wc)
 
 
 # In[]:
-print(len(Playlist1.allLyrics))
-print(len(demo.lyrics))
-
+#print(len(Playlist1.allLyrics))
+#print(len(demo.lyrics))
+"""
 
 # In[]:
+
+
