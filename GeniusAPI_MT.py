@@ -14,6 +14,9 @@ import re
 def lyrics_from_song_api_path(song_api_path, headers):
     """
     This function extracts the lyrics from genius.com using Beautiful Soup
+    
+    
+    
     """
     base_url = 'https://api.genius.com'
     song_url = base_url + song_api_path
@@ -44,9 +47,11 @@ def text_cleaner(text):
     if numb_open_bracket != numb_closed_bracket:
         print("Unequal number of open and closed brackets... \n May have deleted content")
     
-    temp_text = re.sub(r'\[.*?\]', '', text)
-    temp_text = re.sub(r',', '', temp_text)
-    temp_text = temp_text.replace('\n', ' ')
+    temp_text = re.sub(r'\[.*?\]', '', text) 
+    temp_text = re.sub(r',', '', temp_text) # Replace commas with nothing 
+    temp_text = temp_text.replace('(', '')
+    temp_text = temp_text.replace(')', '')
+    temp_text = temp_text.replace('\n', ' ') # Replace new line with space 
 
     print("Length of text before cleaning: ", len(text))
     print("Length of text after cleaning: ", len(temp_text))
@@ -58,7 +63,18 @@ def text_cleaner(text):
 def get_song_lyrics(artist_name, song_title, headers):
     """
     This function checks the genius api to see if an artist and song name combination is in the genius api function family. 
-    If the song's lyrics are available on genius, this function will return the lyrics 
+    This function will return the lyrics if they are available on genius.com
+    It will also run the text cleaner on the lyrics to remove unwanted characters 
+    
+    
+    Inputs: 
+        artist_name = requested artist name (string)
+        song_title = Requested song name (string)
+        headers = Genius header authorization keys (dictionary) 
+    Output: 
+        cleaned_lyrics = lyrics after being cleaned by text cleaner function 
+        ' ' = if the lyrics are not found 
+        
     """
     
     base_url = 'https://api.genius.com'
