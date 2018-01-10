@@ -8,22 +8,23 @@ from pprint import pprint as pp
 from bs4 import BeautifulSoup
 import re
 
+# Testing upstream github dependencies -Devin
 
 # In[2]:
 
 def lyrics_from_song_api_path(song_api_path, headers):
     """
     This function extracts the lyrics from genius.com using Beautiful Soup
-    
-    
-    
+
+
+
     """
     base_url = 'https://api.genius.com'
     song_url = base_url + song_api_path
     # Query genius for lyrics
     resp  = requests.get(song_url, headers=headers)
     json = resp.json()
-    # Find lyrics url, query url  
+    # Find lyrics url, query url
     path = json['response']['song']['path']
     page_url = "http://genius.com" + path
     page = requests.get(page_url)
@@ -36,22 +37,22 @@ def lyrics_from_song_api_path(song_api_path, headers):
 
 # In[4]:
 
-def text_cleaner(text): 
-    """ 
-    This function removes various elements from a text. 
-    It will remove text inside brackets, commas and changes new lines to spaces 
+def text_cleaner(text):
     """
-    
+    This function removes various elements from a text.
+    It will remove text inside brackets, commas and changes new lines to spaces
+    """
+
     numb_open_bracket = text.count('[')
     numb_closed_bracket = text.count(']')
     if numb_open_bracket != numb_closed_bracket:
         print("Unequal number of open and closed brackets... \n May have deleted content")
-    
-    temp_text = re.sub(r'\[.*?\]', '', text) 
-    temp_text = re.sub(r',', '', temp_text) # Replace commas with nothing 
+
+    temp_text = re.sub(r'\[.*?\]', '', text)
+    temp_text = re.sub(r',', '', temp_text) # Replace commas with nothing
     temp_text = temp_text.replace('(', '')
     temp_text = temp_text.replace(')', '')
-    temp_text = temp_text.replace('\n', ' ') # Replace new line with space 
+    temp_text = temp_text.replace('\n', ' ') # Replace new line with space
 
     print("Length of text before cleaning: ", len(text))
     print("Length of text after cleaning: ", len(temp_text))
@@ -62,26 +63,26 @@ def text_cleaner(text):
 
 def get_song_lyrics(artist_name, song_title, headers):
     """
-    This function checks the genius api to see if an artist and song name combination is in the genius api function family. 
+    This function checks the genius api to see if an artist and song name combination is in the genius api function family.
     This function will return the lyrics if they are available on genius.com
-    It will also run the text cleaner on the lyrics to remove unwanted characters 
-    
-    
-    Inputs: 
+    It will also run the text cleaner on the lyrics to remove unwanted characters
+
+
+    Inputs:
         artist_name = requested artist name (string)
         song_title = Requested song name (string)
-        headers = Genius header authorization keys (dictionary) 
-    Output: 
-        cleaned_lyrics = lyrics after being cleaned by text cleaner function 
-        ' ' = if the lyrics are not found 
-        
+        headers = Genius header authorization keys (dictionary)
+    Output:
+        cleaned_lyrics = lyrics after being cleaned by text cleaner function
+        ' ' = if the lyrics are not found
+
     """
-    
+
     base_url = 'https://api.genius.com'
     #song_title = "Lake Song"
     params = {'q': song_title}
     search_url = base_url + '/search'
-    
+
     #artist_name = "The Decemberists"
     resp = requests.get(search_url, params=params, headers=headers)
     resp = resp.json()#['response']['song']
@@ -100,7 +101,7 @@ def get_song_lyrics(artist_name, song_title, headers):
         return(cleaned_lyrics)
     else:
         print("Did not find Artist: ", artist_name, " Song: ", song_title, " combination.")
-        return(' ') 
+        return(' ')
 
 
 # In[5]:
@@ -125,6 +126,3 @@ headers = {'Authorization':'Bearer 8shOdDguRJG7nghujt_1_0HI7Y552WYNWOTbG5a-JAXax
 
 
 # In[ ]:
-
-
-
