@@ -321,6 +321,11 @@ for song in songlist:
 print(len(corpus))
 print(len(wc_corpus))
 
+
+# New list of strings with song lyrics (untested) 
+
+song_lyrics_list = [song.lyrics for song in songlist] 
+
 songs2vec = w2v.Word2Vec(
     sg=1,
     seed=1234,
