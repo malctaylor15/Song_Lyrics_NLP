@@ -1,8 +1,6 @@
 
 # coding: utf-8
 
-# In[ ]:
-
 # System utilities
 import os
 from os import environ
@@ -208,9 +206,9 @@ class song:
         for tag, count in zip(vocab, dist):
             print (tag, count)
 
-
     def getTags(self):
         print(self.blob.tags)
+
     def getNouns(self):
         print(self.blob.noun_phrases)
 
@@ -296,7 +294,7 @@ pp(playlists_info)
 
 playlist_index = 0 # Which playlist index to use
 spotify_tracklist_id = playlists_info[playlist_index][2]
-tracklist = get_tracklist(spotify_tracklist_id, username) # Look at songs in playlist
+tracklist = get_tracklist_class(spotify_tracklist_id, username) # Look at songs in playlist
 
 #############################################
 #### Begin Testing class functionalities ####
