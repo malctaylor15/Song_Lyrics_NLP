@@ -45,7 +45,6 @@ def get_tracklist(tracklist_id, username):
     Output:
         allTracks = dictionary with song artist and track name
 
-
     """
     print("Running get_tracklist...")
     allTracks = {}
@@ -292,7 +291,7 @@ playlists = sp.user_playlists(username)
 playlists_info = get_user_playlists_2(username)
 pp(playlists_info)
 
-playlist_index = 0 # Which playlist index to use
+playlist_index = 1 # Which playlist index to use
 spotify_tracklist_id = playlists_info[playlist_index][2]
 tracklist = get_tracklist_class(spotify_tracklist_id, username) # Look at songs in playlist
 
@@ -301,18 +300,25 @@ tracklist = get_tracklist_class(spotify_tracklist_id, username) # Look at songs 
 #############################################
 
 ### Testing the object functionality
-testSong = song('Rap God', 'Eminem')
+testSong = song('Rap God', 'Eminem') #instantiate a song class object
 testSong.getSentiment()
 
 testSong.showWordCloud()
 print(testSong.polarity)
 
+### Testing playlist class object funcitonality
 testPlaylist = playlist(spotify_tracklist_id, username)
 
-songlist = testPlaylist.listOfSongs
+songList = testPlaylist.listOfSongs
+
+### 20180111 testing
+songLyricsList = [song.lyrics for song in songList]
+pp(songLyricsList)
+
+
 corpus = []
 wc_corpus = str()
-for song in songlist:
+for song in songList:
     words = song.lyrics.lower().split()
     for word in words:
         corpus.append(words)
