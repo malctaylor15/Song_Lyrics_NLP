@@ -14,7 +14,7 @@ import spotipy.util as util
 # NLP Libraries
 from wordcloud import WordCloud
 from textblob import TextBlob
-import gensim.models.word2vec as w2v
+#import gensim.models.word2vec as w2v
 from nltk.tokenize import sent_tokenize, word_tokenize
 import gensim
 
@@ -25,6 +25,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 import re
 from pprint import pprint as pp
 from GeniusAPI_MT import *
+import pandas as pd
 
 # Set environment variables
 os.environ['SPOTIPY_CLIENT_ID'] = "d3c68e4eb95942fb9a0ceb508d62c127"
@@ -259,24 +260,16 @@ class playlist:
 
 
     def getWordCounts(self, numb_words = 200):
-        vectorizer = CountVectorizer(analyzer = "word",
-                                 tokenizer = None,
-                                 preprocessor = None,
-                                 stop_words = None,
-                                 min_df = 0,
-                                 max_features = numb_words)
-
-
-        train_data_features = vectorizer.fit_transform(self.allLyrics)
-        vocab = vectorizer.get_feature_names()
-
-        # Sum up the counts of each vocabulary word
-        dist = np.sum(train_data_features.toarray(), axis=0)
-
-        # For each, print the vocabulary word and the number of times it
-        # appears in the training set
-        for tag, count in zip(vocab, dist):
-            print (tag, count)
+        ### Bag of words functionality
+        self.songLyricsList = [song.lyrics for song in self.listOfSongs]
+        songNames = [song.title for song in self.listOfSongs]
+        #del songNames[0] delete later if not needed
+        #del self.songLyricsList[0]  delete later if not needed
+        vect = CountVectorizer()
+        vectWordFreq = vect.fit_transform(songLyricsList).toarray()
+        vectNames = vect.get_feature_names()
+        self.vectdf = pd.DataFrame(vectWordFreq,columns = vectNames, index=songNames)
+        return self.vectdf
 
 # ## Let's get it running
 
@@ -299,7 +292,7 @@ tracklist = get_tracklist_class(spotify_tracklist_id, username) # Look at songs 
 #### Begin Testing class functionalities ####
 #############################################
 
-### Testing the object functionality
+### Testing the song object functionality
 testSong = song('Rap God', 'Eminem') #instantiate a song class object
 testSong.getSentiment()
 
@@ -308,30 +301,11 @@ print(testSong.polarity)
 
 ### Testing playlist class object funcitonality
 testPlaylist = playlist(spotify_tracklist_id, username)
-
+testPlaylist.getWordCounts()
 songList = testPlaylist.listOfSongs
 
-### 20180111 testing
-songLyricsList = [song.lyrics for song in songList]
-pp(songLyricsList)
-
-
-corpus = []
-wc_corpus = str()
-for song in songList:
-    words = song.lyrics.lower().split()
-    for word in words:
-        corpus.append(words)
-        wc_corpus = wc_corpus + ' ' + word
-
-print(len(corpus))
-print(len(wc_corpus))
-
-
-# New list of strings with song lyrics (untested) 
-
-song_lyrics_list = [song.lyrics for song in songlist] 
-
+# New list of strings with song lyrics (untested)
+"""
 songs2vec = w2v.Word2Vec(
     sg=1,
     seed=1234,
@@ -348,7 +322,7 @@ songs2vec.train(corpus, total_examples = songs2vec.corpus_count
 
 songs2vec.most_similar('rainbow')
 songs2vec.most_similar('cry')
-songs2vec.similarity('rainbow', 'cry')
+songs2vec.similarity('rainbow', 'cry')"""
 
 wc1 = WordCloud().generate(wc_corpus)
 wc1.to_image().show()
