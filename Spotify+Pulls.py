@@ -20,6 +20,7 @@ import gensim
 
 import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfTransformer
 
 # Random
 import re
@@ -262,14 +263,21 @@ class playlist:
     def getWordCounts(self, numb_words = 200):
         ### Bag of words functionality
         self.songLyricsList = [song.lyrics for song in self.listOfSongs]
-        songNames = [song.title for song in self.listOfSongs]
+        self.songNames = [song.title for song in self.listOfSongs]
         #del songNames[0] delete later if not needed
         #del self.songLyricsList[0]  delete later if not needed
         vect = CountVectorizer()
-        vectWordFreq = vect.fit_transform(songLyricsList).toarray()
-        vectNames = vect.get_feature_names()
-        self.vectdf = pd.DataFrame(vectWordFreq,columns = vectNames, index=songNames)
+        vectWordFreq = vect.fit_transform(self.songLyricsList).toarray()
+        self.vectNames = vect.get_feature_names()
+        self.vectdf = pd.DataFrame(vectWordFreq,columns = self.vectNames, index=self.songNames)
         return self.vectdf
+
+    def getTfidf(self):
+        self.wordFrequency = self.getWordCounts() #copied from elswhere
+        transformer = TfidfTransformer(smooth_idf=False)
+        tfidf = transformer.fit_transform(self.wordFrequency.values)
+        self.tfidf_df = pd.DataFrame(tfidf.toarray(),columns = self.vectNames, index=self.songNames)
+        return self.tfidf_df
 
 # ## Let's get it running
 
@@ -288,6 +296,21 @@ playlist_index = 1 # Which playlist index to use
 spotify_tracklist_id = playlists_info[playlist_index][2]
 tracklist = get_tracklist_class(spotify_tracklist_id, username) # Look at songs in playlist
 
+### Writing tfidf 20180121
+
+
+"""tfidf_test = tfidf_df.drop(["F**kin' Problems"],axis=0) #for testing only
+
+
+tfidf_test2 = tfidf_test.all(axis=0)
+wordsInAllSongs = tfidf_test2[tfidf_test2 == True]
+
+tfidf_df.iloc[1].sort_values(ascending=False) #for testing only
+tfidf_df.iloc[2].sort_values(ascending=False) #for testing only
+tfidf_df.iloc[3].sort_values(ascending=False) #for testing only"""
+
+
+
 #############################################
 #### Begin Testing class functionalities ####
 #############################################
@@ -301,7 +324,8 @@ print(testSong.polarity)
 
 ### Testing playlist class object funcitonality
 testPlaylist = playlist(spotify_tracklist_id, username)
-testPlaylist.getWordCounts()
+testPlaylist.getTfidf()
+wordFrequency = testPlaylist.getWordCounts()
 songList = testPlaylist.listOfSongs
 
 # New list of strings with song lyrics (untested)
@@ -324,5 +348,5 @@ songs2vec.most_similar('rainbow')
 songs2vec.most_similar('cry')
 songs2vec.similarity('rainbow', 'cry')"""
 
-wc1 = WordCloud().generate(wc_corpus)
-wc1.to_image().show()
+#wc1 = WordCloud().generate(wc_corpus)
+#wc1.to_image().show()
