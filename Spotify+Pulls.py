@@ -17,6 +17,7 @@ from textblob import TextBlob
 #import gensim.models.word2vec as w2v
 from nltk.tokenize import sent_tokenize, word_tokenize
 import gensim
+import nltk
 
 import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
@@ -350,3 +351,63 @@ songs2vec.similarity('rainbow', 'cry')"""
 
 #wc1 = WordCloud().generate(wc_corpus)
 #wc1.to_image().show()
+
+
+
+
+
+
+####################################
+### Testing nltk 20180126 -Devin ###
+####################################
+
+from nltk.corpus import stopwords
+nltk.download_shell() # Downloads the corpus using a shell
+#stopwords.words('english') # These are commonly used words with little useful meaning
+from nltk.corpus import brown # Importing Brown University corpus
+#brown.sents(categories=['news', 'editorial']) # Sentences from periodical text
+words = [word for word in brown.words(categories=['news', 'editorial']) if word.lower() not in stopwords.words('english')]
+words
+
+### Non-funcitonal (on an entire corpus) punctuation removals (works on smallset of words) ###
+
+def _remove_regex(input_text, regex_pattern):
+    urls = re.finditer(regex_pattern, input_text)
+    for i in urls:
+        input_text = re.sub(i.group().strip(), '', input_text)
+    print(input_text)
+    return input_text
+regex_pattern = "\W"
+
+_remove_regex('remove this #hashtag from analytics vidhya', regex_pattern)
+
+################################################################################################
+
+from collections import Counter
+import pandas as pd
+import numpy as np
+
+counter  = Counter(words)
+
+counter.most_common(15)
+
+np.mean([x for x in counter.values()])
+np.median([x for x in counter.values()])
+
+### One possible preprocessing implementation, but probaly wont be used, just observed while building our own
+
+import string
+import nltk
+from nltk.tokenize import RegexpTokenizer
+from nltk.corpus import stopwords
+import re
+
+def preprocess(sentence):
+	sentence = sentence.lower()
+	tokenizer = RegexpTokenizer(r'\w+')
+	tokens = tokenizer.tokenize(sentence)
+	filtered_words = [w for w in tokens if not w in stopwords.words('english')]
+	return " ".join(filtered_words)
+
+sentence = "At eight o'clock on Thursday morning Arthur didn't feel very good. French-Fries"
+print(preprocess(sentence))
