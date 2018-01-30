@@ -307,21 +307,41 @@ tracklist = get_tracklist_class(spotify_tracklist_id, username) # Look at songs 
 #### Begin Testing class functionalities ####
 #############################################
 
-### Testing the song object functionality
+### Song Object Functionality ###
 testSong = song('Rap God', 'Eminem') #instantiate a song class object
 testSong.getSentiment()
-
 testSong.showWordCloud()
-print(testSong.polarity)
+print(testSong.polarity) # Same as getSentiment() ?
+
+##############################
+### test the lemmatization 20180130 ###
+##############################
+"""lyricsBeforeAndAfter  =
+for lyricsBeforeAndAfter in this:
+    if lyricsBeforeAndAfter[0] != lyricsBeforeAndAfter[1]:
+        print(lyricsBeforeAndAfter)"""
+
+###############################
+
+### Testing word counting after lemmatization is done 20180130 ###
+testSongTokenized = word_tokenize(testSong.lyrics)
+counter = Counter(testSongTokenized)
+counter.most_common(15)
+
+############################################################
 
 ### Testing playlist class object funcitonality
+
 testPlaylist = playlist(spotify_tracklist_id, username)
+
 testPlaylist.getTfidf()
 wordFrequency = testPlaylist.getWordCounts()
+wordFrequency
 
 ### Get the words showing in all the songs of a playlist ### 20180129
 songList = testPlaylist.getTfidf().drop("F**kin' Problems",axis=0)
 songList.T[songList.apply(lambda col: col.all((0)),axis=0)]
+
 # New list of strings with song lyrics (untested)
 
 """
@@ -363,25 +383,6 @@ from nltk.corpus import brown # Importing Brown University corpus
 words = [word for word in brown.words(categories=['news', 'editorial']) if word.lower() not in stopwords.words('english')]
 brown.sents(categories=['news'])[0]
 words
-
-### Non-funcitonal (on an entire corpus) punctuation removals (works on smallset of words) ###
-
-"""def _remove_regex(input_text, regex_pattern):
-    urls = re.finditer(regex_pattern, input_text)
-    for i in urls:
-        input_text = re.sub(i.group().strip(), '', input_text)
-    return input_text
-regex_pattern = "\W"
-
-_remove_regex('remove this #hashtag from analytics vidhya', regex_pattern)
-
-cleanWords = []
-for word in words:
-    try:
-         cleanWords.append(_remove_regex(word, regex_pattern))
-    except:
-        print('Oops')"""
-
 
 ################################################################################################
 

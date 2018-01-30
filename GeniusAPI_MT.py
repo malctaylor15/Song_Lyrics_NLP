@@ -6,6 +6,8 @@ import re #regular expressions module
 import nltk # Natural language processing
 from nltk.tokenize import RegexpTokenizer # Regex handler
 from nltk.corpus import stopwords # Commonly used words
+from nltk.stem.wordnet import WordNetLemmatizer # Convert words into root form
+from nltk.stem.porter import PorterStemmer # Strip suffixes from words
 
 from pprint import pprint as pp #pretty printing module
 from bs4 import BeautifulSoup #web parser module
@@ -16,7 +18,7 @@ def lyrics_from_song_api_path(song_api_path, headers):
     """
     This function extracts the lyrics from genius.com using Beautiful Soup
     """
-
+    print("Running lyrics_from_song_api_path()...") # For Testing
     base_url = 'https://api.genius.com'
     song_url = base_url + song_api_path
     # Query genius for lyrics
@@ -37,11 +39,29 @@ def text_cleaner(text):
     This function removes various elements from a text.
     It will remove text inside brackets, commas and changes new lines to spaces
     """
+    print("Running text_cleaner()...") # For Testing
+    lem = WordNetLemmatizer() # Create a lemmatization object
     text = text.lower()
     tokenizer = RegexpTokenizer(r'\w+')
     tokens = tokenizer.tokenize(text)
-    filtered_words = [w for w in tokens if not w in stopwords.words('english')]
+    filtered_words = [lem.lemmatize(w) for w in tokens if not w in stopwords.words('english')]
+    filtered_wordsTEST = [[w, lem.lemmatize(w)] for w in tokens if not w in stopwords.words('english')] # For Testing 20180130
+    #print(filtered_wordsTEST) # For Testing 20180130
     return " ".join(filtered_words)
+
+    # 20180130 testing lemmatizaton & stemming
+
+
+"""    from nltk import word_tokenize
+    nltk.pos_tag(text) # Tagging part of speech
+
+
+    stem = PorterStemmer() # Not to be used most likely (alternative to lemmatization)
+    word = "cats"
+    lem.lemmatize(word)"""
+    #stem.stem(word)
+
+
 """    numb_open_bracket = text.count('[')
     numb_closed_bracket = text.count(']')
     if numb_open_bracket != numb_closed_bracket:
@@ -74,7 +94,7 @@ def get_song_lyrics(artist_name, song_title, headers):
         cleaned_lyrics = lyrics after being cleaned by text cleaner function
         ' ' = if the lyrics are not found
     """
-
+    print("Running get_song_lyrics()...") # For testing
     base_url = 'https://api.genius.com'
     #song_title = "Lake Song"
     params = {'q': song_title}
