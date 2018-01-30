@@ -3,6 +3,10 @@
 import requests #web commands module
 import re #regular expressions module
 
+import nltk # Natural language processing
+from nltk.tokenize import RegexpTokenizer # Regex handler
+from nltk.corpus import stopwords # Commonly used words
+
 from pprint import pprint as pp #pretty printing module
 from bs4 import BeautifulSoup #web parser module
 
@@ -33,8 +37,12 @@ def text_cleaner(text):
     This function removes various elements from a text.
     It will remove text inside brackets, commas and changes new lines to spaces
     """
-
-    numb_open_bracket = text.count('[')
+    text = text.lower()
+    tokenizer = RegexpTokenizer(r'\w+')
+    tokens = tokenizer.tokenize(text)
+    filtered_words = [w for w in tokens if not w in stopwords.words('english')]
+    return " ".join(filtered_words)
+"""    numb_open_bracket = text.count('[')
     numb_closed_bracket = text.count(']')
     if numb_open_bracket != numb_closed_bracket:
         print("Unequal # of open & closed brackets... \n May have deleted content")
@@ -50,7 +58,7 @@ def text_cleaner(text):
     #print("Pre-cleaning chars: ", len(text))
     #print("Post-cleaning chars: ", len(temp_text))
     print("Removed", len(text) - len(temp_text), "characters during cleaning.")
-    return(temp_text)
+    return(temp_text)"""
 
 def get_song_lyrics(artist_name, song_title, headers):
     """
@@ -92,5 +100,5 @@ def get_song_lyrics(artist_name, song_title, headers):
         print(song_title,"by", artist_name, "not found in Genius.")
         return(' ')
 
-test_lyrics = get_song_lyrics(artist_name="Kendrick Lamar", song_title="HUMBLE.", headers=headers)
-print(test_lyrics)
+#test_lyrics = get_song_lyrics(artist_name="Kendrick Lamar", song_title="HUMBLE.", headers=headers)
+#print(test_lyrics)

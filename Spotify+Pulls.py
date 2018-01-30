@@ -26,7 +26,13 @@ from sklearn.feature_extraction.text import TfidfTransformer
 # Random
 import re
 from pprint import pprint as pp
+
+%reload_ext GeniusAPI_MT
+import GeniusAPI_MT
+from importlib import reload
+reload(GeniusAPI_MT)
 from GeniusAPI_MT import *
+
 import pandas as pd
 
 # Set environment variables
@@ -297,21 +303,6 @@ playlist_index = 1 # Which playlist index to use
 spotify_tracklist_id = playlists_info[playlist_index][2]
 tracklist = get_tracklist_class(spotify_tracklist_id, username) # Look at songs in playlist
 
-### Writing tfidf 20180121
-
-
-"""tfidf_test = tfidf_df.drop(["F**kin' Problems"],axis=0) #for testing only
-
-
-tfidf_test2 = tfidf_test.all(axis=0)
-wordsInAllSongs = tfidf_test2[tfidf_test2 == True]
-
-tfidf_df.iloc[1].sort_values(ascending=False) #for testing only
-tfidf_df.iloc[2].sort_values(ascending=False) #for testing only
-tfidf_df.iloc[3].sort_values(ascending=False) #for testing only"""
-
-
-
 #############################################
 #### Begin Testing class functionalities ####
 #############################################
@@ -327,9 +318,12 @@ print(testSong.polarity)
 testPlaylist = playlist(spotify_tracklist_id, username)
 testPlaylist.getTfidf()
 wordFrequency = testPlaylist.getWordCounts()
-songList = testPlaylist.listOfSongs
 
+### Get the words showing in all the songs of a playlist ### 20180129
+songList = testPlaylist.getTfidf().drop("F**kin' Problems",axis=0)
+songList.T[songList.apply(lambda col: col.all((0)),axis=0)]
 # New list of strings with song lyrics (untested)
+
 """
 songs2vec = w2v.Word2Vec(
     sg=1,
@@ -363,23 +357,31 @@ songs2vec.similarity('rainbow', 'cry')"""
 
 from nltk.corpus import stopwords
 nltk.download_shell() # Downloads the corpus using a shell
-#stopwords.words('english') # These are commonly used words with little useful meaning
+stopwords.words('english') # These are commonly used words with little useful meaning
 from nltk.corpus import brown # Importing Brown University corpus
 #brown.sents(categories=['news', 'editorial']) # Sentences from periodical text
 words = [word for word in brown.words(categories=['news', 'editorial']) if word.lower() not in stopwords.words('english')]
+brown.sents(categories=['news'])[0]
 words
 
 ### Non-funcitonal (on an entire corpus) punctuation removals (works on smallset of words) ###
 
-def _remove_regex(input_text, regex_pattern):
+"""def _remove_regex(input_text, regex_pattern):
     urls = re.finditer(regex_pattern, input_text)
     for i in urls:
         input_text = re.sub(i.group().strip(), '', input_text)
-    print(input_text)
     return input_text
 regex_pattern = "\W"
 
 _remove_regex('remove this #hashtag from analytics vidhya', regex_pattern)
+
+cleanWords = []
+for word in words:
+    try:
+         cleanWords.append(_remove_regex(word, regex_pattern))
+    except:
+        print('Oops')"""
+
 
 ################################################################################################
 
@@ -387,9 +389,9 @@ from collections import Counter
 import pandas as pd
 import numpy as np
 
-counter  = Counter(words)
+counter  = Counter(cleanWords)
 
-counter.most_common(15)
+counter.most_common(150)
 
 np.mean([x for x in counter.values()])
 np.median([x for x in counter.values()])
@@ -409,5 +411,21 @@ def preprocess(sentence):
 	filtered_words = [w for w in tokens if not w in stopwords.words('english')]
 	return " ".join(filtered_words)
 
-sentence = "At eight o'clock on Thursday morning Arthur didn't feel very good. French-Fries"
-print(preprocess(sentence))
+sentence = "At eight o'clock on Thursday morning Arthur didn't feel very good. French-Fries" # Example
+print(preprocess(sentence)) # Example
+
+sentence1 = []
+cleanWords2 = []
+for sentence in brown.sents(categories='news'):
+    for word in sentence:
+        sentence1.append(word)
+
+for word in sentence1:
+    cleanWords2.append(preprocess(word))
+
+cleanWords2 = list(filter(None, cleanWords2))
+cleanWords2
+
+counter = Counter(cleanWords2)
+counter.most_common(15)
+sentence1
