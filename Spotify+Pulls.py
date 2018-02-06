@@ -317,18 +317,63 @@ print(testSong.polarity) # Same as getSentiment() ?
 ############################################################
 
 ### Testing playlist class object funcTIonality
+playlists = sp.category_playlists('hiphop')
+playlists['playlists']['items'][0]
+testPlaylist = playlist('37i9dQZF1DX0XUsuxWHRQd', 'spotify')
 
-testPlaylist = playlist(spotify_tracklist_id, username)
 
+#20180206
+###################################################
+song_lyrics = [song.lyrics for song in testPlaylist.listOfSongs]
+type(song_lyrics[0])
+songLyricsNonEmpty = [lyrics for lyrics in song_lyrics if lyrics != ' ']
+
+lyrics1 = ''
+for lyrics in songLyricsNonEmpty:
+    lyrics1 = lyrics1 + " " +  lyrics
+lyrics1
+len(lyrics1)
+len(nltk.word_tokenize(lyrics1))
+demoLyrics = list(set(nltk.word_tokenize(lyrics1)))
+demoLyrics.sort()
+
+slang = [word for word in demoLyrics if word not in word_list]
+len(slang)
+slang
+[word for word in word_list if word == "attended"]
+
+import enchant
+d = enchant.Dict("en_US")
+d.check("Hello")
+d.check("Helo")
+d.suggest("Helo")
+
+
+
+
+songLyricsNonEmpty = [lyrics1+lyrics for lyrics in songLyricsNonEmpty]
+songLyricsNonEmpty
+' '.join(songLyricsNonEmpty)
+testPlaylist.getWordCounts().iloc[0]
 testPlaylist.getTfidf()
 wordFrequency = testPlaylist.getWordCounts()
 wordFrequency
+#############################################################
+
 
 ### Get the words showing in all the songs of a playlist ### 20180129
-songList = testPlaylist.getTfidf().drop("F**kin' Problems",axis=0)
+songList = testPlaylist.getTfidf()#.drop("F**kin' Problems",axis=0)
 songList.T[songList.apply(lambda col: col.all((0)),axis=0)]
 
 #wc1 = WordCloud().generate(wc_corpus)
 #wc1.to_image().show()
 
 ################################################################################################
+
+
+###20180206 testing ###
+from nltk.corpus import words
+word_list = words.words()
+# prints 236736
+type(word_list)
+print(len(word_list))

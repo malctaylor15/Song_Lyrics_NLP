@@ -18,7 +18,7 @@ def lyrics_from_song_api_path(song_api_path, headers):
     """
     This function extracts the lyrics from genius.com using Beautiful Soup
     """
-    print("Running lyrics_from_song_api_path()...") # For Testing
+    #print("Running lyrics_from_song_api_path()...") # For Testing
     base_url = 'https://api.genius.com'
     song_url = base_url + song_api_path
     # Query genius for lyrics
@@ -39,7 +39,7 @@ def text_cleaner(text):
     This function removes various elements from a text.
     It will remove text inside brackets, commas and changes new lines to spaces
     """
-    print("Running text_cleaner()...") # For Testing
+    #print("Running text_cleaner()...") # For Testing
     lem = WordNetLemmatizer() # Create a lemmatization object
     text = text.lower()
     tokenizer = RegexpTokenizer(r'\w+')
@@ -66,7 +66,7 @@ def get_song_lyrics(artist_name, song_title, headers):
         cleaned_lyrics = lyrics after being cleaned by text cleaner function
         ' ' = if the lyrics are not found
     """
-    print("Running get_song_lyrics()...") # For testing
+    #print("Running get_song_lyrics()...") # For testing
     base_url = 'https://api.genius.com'
     #song_title = "Lake Song"
     params = {'q': song_title}
