@@ -308,29 +308,15 @@ tracklist = get_tracklist_class(spotify_tracklist_id, username) # Look at songs 
 #############################################
 
 ### Song Object Functionality ###
-testSong = song('Rap God', 'Eminem') #instantiate a song class object
+testSong = song('Free Bird', 'Lynyrd Skynyrd') #instantiate a song class object
 testSong.getSentiment()
 testSong.showWordCloud()
 print(testSong.polarity) # Same as getSentiment() ?
 
-##############################
-### test the lemmatization 20180130 ###
-##############################
-"""lyricsBeforeAndAfter  =
-for lyricsBeforeAndAfter in this:
-    if lyricsBeforeAndAfter[0] != lyricsBeforeAndAfter[1]:
-        print(lyricsBeforeAndAfter)"""
-
-###############################
-
-### Testing word counting after lemmatization is done 20180130 ###
-testSongTokenized = word_tokenize(testSong.lyrics)
-counter = Counter(testSongTokenized)
-counter.most_common(15)
 
 ############################################################
 
-### Testing playlist class object funcitonality
+### Testing playlist class object funcTIonality
 
 testPlaylist = playlist(spotify_tracklist_id, username)
 
@@ -342,91 +328,7 @@ wordFrequency
 songList = testPlaylist.getTfidf().drop("F**kin' Problems",axis=0)
 songList.T[songList.apply(lambda col: col.all((0)),axis=0)]
 
-# New list of strings with song lyrics (untested)
-
-"""
-songs2vec = w2v.Word2Vec(
-    sg=1,
-    seed=1234,
-    size=20,
-    min_count=4,
-    window=7,
-    sample=1e-1
-    )
-
-songs2vec.build_vocab(corpus)
-songs2vec.corpus_count
-songs2vec.train(corpus, total_examples = songs2vec.corpus_count
-                , epochs = songs2vec.iter)
-
-songs2vec.most_similar('rainbow')
-songs2vec.most_similar('cry')
-songs2vec.similarity('rainbow', 'cry')"""
-
 #wc1 = WordCloud().generate(wc_corpus)
 #wc1.to_image().show()
 
-
-
-
-
-
-####################################
-### Testing nltk 20180126 -Devin ###
-####################################
-
-from nltk.corpus import stopwords
-nltk.download_shell() # Downloads the corpus using a shell
-stopwords.words('english') # These are commonly used words with little useful meaning
-from nltk.corpus import brown # Importing Brown University corpus
-#brown.sents(categories=['news', 'editorial']) # Sentences from periodical text
-words = [word for word in brown.words(categories=['news', 'editorial']) if word.lower() not in stopwords.words('english')]
-brown.sents(categories=['news'])[0]
-words
-
 ################################################################################################
-
-from collections import Counter
-import pandas as pd
-import numpy as np
-
-counter  = Counter(cleanWords)
-
-counter.most_common(150)
-
-np.mean([x for x in counter.values()])
-np.median([x for x in counter.values()])
-
-### One possible preprocessing implementation, but probaly wont be used, just observed while building our own
-
-import string
-import nltk
-from nltk.tokenize import RegexpTokenizer
-from nltk.corpus import stopwords
-import re
-
-def preprocess(sentence):
-	sentence = sentence.lower()
-	tokenizer = RegexpTokenizer(r'\w+')
-	tokens = tokenizer.tokenize(sentence)
-	filtered_words = [w for w in tokens if not w in stopwords.words('english')]
-	return " ".join(filtered_words)
-
-sentence = "At eight o'clock on Thursday morning Arthur didn't feel very good. French-Fries" # Example
-print(preprocess(sentence)) # Example
-
-sentence1 = []
-cleanWords2 = []
-for sentence in brown.sents(categories='news'):
-    for word in sentence:
-        sentence1.append(word)
-
-for word in sentence1:
-    cleanWords2.append(preprocess(word))
-
-cleanWords2 = list(filter(None, cleanWords2))
-cleanWords2
-
-counter = Counter(cleanWords2)
-counter.most_common(15)
-sentence1
