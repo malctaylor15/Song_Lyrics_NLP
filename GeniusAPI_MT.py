@@ -49,36 +49,8 @@ def text_cleaner(text):
     #print(filtered_wordsTEST) # For Testing 20180130
     return " ".join(filtered_words)
 
-    # 20180130 testing lemmatizaton & stemming
 
 
-"""    from nltk import word_tokenize
-    nltk.pos_tag(text) # Tagging part of speech
-
-
-    stem = PorterStemmer() # Not to be used most likely (alternative to lemmatization)
-    word = "cats"
-    lem.lemmatize(word)"""
-    #stem.stem(word)
-
-
-"""    numb_open_bracket = text.count('[')
-    numb_closed_bracket = text.count(']')
-    if numb_open_bracket != numb_closed_bracket:
-        print("Unequal # of open & closed brackets... \n May have deleted content")
-
-    temp_text = re.sub(r'\[.*?\]', '', text)
-    temp_text = re.sub(r',', '', temp_text) # Replace commas with nothing
-    temp_text = temp_text.replace('(', '') # Delete '('
-    temp_text = temp_text.replace(')', '') # Delete ')'
-    temp_text = temp_text.replace('\n', ' ') # Replace new line with space
-    temp_text = temp_text.replace('?', '') # Delete '?'
-    temp_text = temp_text.replace('!', '') # Delete '!'
-
-    #print("Pre-cleaning chars: ", len(text))
-    #print("Post-cleaning chars: ", len(temp_text))
-    print("Removed", len(text) - len(temp_text), "characters during cleaning.")
-    return(temp_text)"""
 
 def get_song_lyrics(artist_name, song_title, headers):
     """
