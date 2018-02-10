@@ -4,6 +4,11 @@ from os import environ
 import subprocess
 import sys
 
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+%matplotlib inline
+
 # Spotify API
 import spotipy
 import spotipy.util as util
@@ -54,7 +59,7 @@ print(testSong.polarity) # Same as getSentiment()
 ### Testing playlist class object funcTIonality
 playlists = sp.category_playlists('hiphop')
 
-# Notes... can delete later
+# NOTE... can delete later
 [key for key in playlists.keys()]
 [key for key in playlists['playlists'].keys()]
 [key for key in playlists['playlists']['items']]
@@ -67,7 +72,7 @@ playlist_name_id = [(key['name'],  key['owner']['id'],key['tracks']['total'] , k
 playlist_info = pd.DataFrame(playlist_name_id, columns = ["Name", "Owner", "Number_of_tracks", "Tracklist_id"])
 playlist_info
 
-# One way
+# NOTE... can delete later
 playlist_info[playlist_info.Name == "Gold School"].Tracklist_id
 
 # Way two
@@ -75,10 +80,47 @@ playlist_info.index = playlist_info.Name
 playlist_info.loc["Gold School"].Tracklist_id
 playlist_info.loc["Gold School"].Owner
 
-import playlist
-reload(playlist)
-from playlist import *
 testPlaylist = playlist('37i9dQZF1DX0XUsuxWHRQd', 'spotify', sp)
+
+playlist_sent_l = [(song.title, song.artist, len(song.lyrics.split()), song.getSentiment()) for song in testPlaylist.listOfSongs ]
+song_name_sent = pd.DataFrame(playlist_sent_l, columns = ["Title", "Artist", "Numb_words_in_song" ,"Sentiment"])
+song_name_sent.sort_values("Sentiment", ascending = False)
+# Songs without sentiment
+good_songs = song_name_sent[song_name_sent.Sentiment != 0]
+
+# Number of songs before
+len(playlist_sent_l)
+# Number of songs after
+len(good_songs)
+# Percentage drop
+(1 - len(good_songs)/len(playlist_sent_l))*100
+
+
+good_songs.Numb_words_in_song.describe()
+good_songs.Numb_words_in_song.plot(kind = "hist")
+
+good_songs.Sentiment.mean()
+good_songs.Sentiment.plot(kind = "hist")
+
+
+artist_gb = good_songs.groupby("Artist")
+# NOTE... can delete later
+artist_count_all = artist_gb.Title.count() # Not what I wanted but good example
+# Applies count to all columns .. only want to count titles
+# Not sure how to do but...
+
+artist_count2 = artist_gb.agg({"Title": "count", "Sentiment":"mean"})[artist_gb.count().Title > 1].sort_values("Sentiment", ascending = False)
+
+artist_count2
+
+
+###20180206 testing ###
+from nltk.corpus import words
+word_list = words.words()
+# prints 236736
+type(word_list)
+print(len(word_list))
+
 
 
 #20180206
@@ -128,11 +170,3 @@ songList.T[songList.apply(lambda col: col.all((0)),axis=0)]
 #wc1.to_image().show()
 
 ################################################################################################
-
-
-###20180206 testing ###
-from nltk.corpus import words
-word_list = words.words()
-# prints 236736
-type(word_list)
-print(len(word_list))

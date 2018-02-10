@@ -149,12 +149,13 @@ def get_tracklist_lyrics(tracklist):
             lyrics = lyrics + song.lyrics
     return(lyrics)
 
+
+"""
 # Import Genius API functions
 #sys.path.append('/Users/board/Desktop/Kaggle/Song_Lyrics_NLP')
 currentDirectory = os.getcwd()
 sys.path.append(currentDirectory)
 
-"""
 lyrics_dict = {}
 for song_name, artist in tracklist.items():
     lyrics_dict[song_name] = get_song_lyrics(artist_name=artist, song_title=song_name, headers=headers)
