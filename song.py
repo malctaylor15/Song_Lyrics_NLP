@@ -55,25 +55,19 @@ class song:
             print("Polarity is ", self.polarity)
         return(self.polarity)
 
-    def getWordCounts(self, numb_words = 200):
-        vectorizer = CountVectorizer(analyzer = "word",
-                                 tokenizer = None,
-                                 preprocessor = None,
-                                 stop_words = None,
-                                 min_df = 0,
-                                 max_features = numb_words)
-
-
-        train_data_features = vectorizer.fit_transform(self.lyrics)
+    def getWordCounts(self):
+        """
+        Counts the number of times a word is in a song 
+        """
+        vectorizer = CountVectorizer()
+        feats = vectorizer.fit_transform([self.lyrics]).toarray()[0]
         vocab = vectorizer.get_feature_names()
 
-        # Sum up the counts of each vocabulary word
-        dist = np.sum(train_data_features.toarray(), axis=0)
+        word_counts = pd.Series(feats, index = vocab).T.sort_values(ascending = False)
 
-        # For each, print the vocabulary word and the number of times it
-        # appears in the training set
-        for tag, count in zip(vocab, dist):
-            print (tag, count)
+        return(word_counts)
+
+
 
     def getTags(self):
         print(self.blob.tags)
