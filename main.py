@@ -85,6 +85,7 @@ testPlaylist = playlist(playlist_info.loc[playlist_name].Tracklist_id, playlist_
 playlist_sent_l = [(song.title, song.artist, len(song.lyrics.split()), song.getSentiment()) for song in testPlaylist.listOfSongs ]
 song_name_sent = pd.DataFrame(playlist_sent_l, columns = ["Title", "Artist", "Numb_words_in_song" ,"Sentiment"])
 song_name_sent.sort_values("Sentiment", ascending = False)
+
 # Songs without sentiment
 good_songs = song_name_sent[song_name_sent.Sentiment != 0]
 
@@ -171,15 +172,6 @@ d.check("Helo")
 d.suggest("Helo")
 
 
-
-
-songLyricsNonEmpty = [lyrics1+lyrics for lyrics in songLyricsNonEmpty]
-songLyricsNonEmpty
-' '.join(songLyricsNonEmpty)
-testPlaylist.getWordCounts().iloc[0]
-testPlaylist.getTfidf()
-wordFrequency = testPlaylist.getWordCounts()
-wordFrequency
 #############################################################
 
 
