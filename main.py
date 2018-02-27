@@ -37,17 +37,6 @@ scope = 'user-library-read playlist-read-private user-top-read' #the permissions
 token = util.prompt_for_user_token(username,scope)
 sp = spotipy.Spotify(auth=token)
 
-# Look at user playlist name, number of tracks, and spotify tracklist id
-"""
-playlists_info = get_user_playlists_2(username, playlists)
-print(playlists_info)
-type(playlists_info)
-playlists_info = playlists_info.set_index('Name')
-spotify_tracklist_id = playlists_info.Tracklist_id.loc['Spotify.Me']
-print(spotify_tracklist_id)
-tracklist = get_tracklist_class(spotify_tracklist_id, username, sp) # Look at songs in playlist
-"""
-
 #############################################
 #### Begin Testing class functionalities ####
 #############################################
@@ -60,7 +49,6 @@ testSong.getWordCounts()[testSong.getWordCounts() > 3]
 print(testSong.polarity) # Same as getSentiment()
 # running getSentiment will define song class attribute polarity
 
-
 ############################################################
 
 ### Testing playlist class object functionality
@@ -69,24 +57,23 @@ print(testSong.polarity) # Same as getSentiment()
 playlists = sp.user_playlists(username)
 
 # Now has list with name and id
-playlist_name_id = [(key['name'],  key['owner']['id'],key['tracks']['total'] , key['id']) \
-                    for key in playlists['items']]
-playlist_info = pd.DataFrame(playlist_name_id, columns = ["Name", "Owner", "Number_of_tracks", "Tracklist_id"])
+playlist_name_id = [(key['name'],  key['owner']['id'], key['tracks']['total'], key['id']) \
+                    for key in playlists['items']] # Extract the metadata for each song of the playlist
+playlist_name_id
+playlist_info = pd.DataFrame(playlist_name_id, columns = ["Name", "Owner", "Number_of_tracks", "Tracklist_id"]) # Set the column names for the playlist metadata
 playlist_info.columns
-
 
 playlist_name = "May 2015"
 playlist_info = playlist_info.set_index('Name')
-
 
 testPlaylist = playlist(playlist_info.loc[playlist_name].Tracklist_id, playlist_info.loc[playlist_name].Owner, sp)
 
 ### Start playlist analysis ###
 playlist_sent_l = [(song.title, song.artist, len(song.lyrics.split()), song.getSentiment()) for song in testPlaylist.listOfSongs ]
-song_name_sent = pd.DataFrame(playlist_sent_l, columns = ["Title", "Artist", "Numb_words_in_song" ,"Sentiment"])
+song_name_sent = pd.DataFrame(playlist_sent_l, columns = ["Title", "Artist", "Numb_words_in_song" ,"Sentiment"]) # Creating dataframe from running the song class on each song of the playlist given
 song_name_sent.sort_values("Sentiment", ascending = False)
-# Songs without sentiment
-good_songs = song_name_sent[song_name_sent.Sentiment != 0]
+
+good_songs = song_name_sent[song_name_sent.Sentiment != 0] # Filters out songs w/o sentiment
 
 # Number songs dropped
 len(playlist_sent_l) - len(good_songs)
@@ -104,20 +91,16 @@ good_songs.Numb_words_in_song.plot(kind = "hist")
 good_songs.Sentiment.mean()
 good_songs.Sentiment.plot(kind = "hist")
 
-
+###Gather song count by artist###
 artist_gb = good_songs.groupby("Artist")
-
-# NOTE... can delete later
 artist_count_all = artist_gb.Title.count() # Not what I wanted but g
 artist_count_all
-#good example
-# Applies count to all columns .. only want to count titles
-# Not sure how to do but...
 
+### Gather the average sentiment for the songs of an artist with mroe than 1 song###
 artist_count2 = artist_gb.agg({"Title": "count", "Sentiment":"mean"})[artist_gb.count().Title > 1].sort_values("Sentiment", ascending = False)
 artist_count2
 
-# Song analysis
+### Song analysis ###
 song_demo = testPlaylist.listOfSongs[1]
 song_demo.getWordCounts()
 song_demo.title
@@ -127,51 +110,28 @@ words = [word for word in song_demo.lyrics.split()]
 
 len([word for word in song_demo.lyrics.split() if word == "tu"])
 
-
 words[:4]
 [song_demo.lyrics]
 feats = vect.fit_transform([song_demo.lyrics]).toarray()[0]
-
+song.getWordCounts(song_demo)
 pd.Series(feats, index = vect.get_feature_names()).T.sort_values(ascending = False)
 feats
 
-###20180206 testing ###
-from nltk.corpus import words
-word_list = words.words()
-# prints 236736
-type(word_list)
-print(len(word_list))
 
-
-
-#20180206
 ###################################################
 song_lyrics = [song.lyrics for song in testPlaylist.listOfSongs]
-type(song_lyrics[0])
 songLyricsNonEmpty = [lyrics for lyrics in song_lyrics if lyrics != ' ']
+songLyricsNonEmpty
 
 lyrics1 = ''
 for lyrics in songLyricsNonEmpty:
-    lyrics1 = lyrics1 + " " +  lyrics
+    lyrics1 = lyrics1 + " " +  lyrics # Combine the lyrics of all the songs into one string
 lyrics1
 len(lyrics1)
 len(nltk.word_tokenize(lyrics1))
 demoLyrics = list(set(nltk.word_tokenize(lyrics1)))
 demoLyrics.sort()
-
-slang = [word for word in demoLyrics if word not in word_list]
-len(slang)
-slang
-[word for word in word_list if word == "attended"]
-
-import enchant
-d = enchant.Dict("en_US")
-d.check("Hello")
-d.check("Helo")
-d.suggest("Helo")
-
-
-
+demoLyrics
 
 songLyricsNonEmpty = [lyrics1+lyrics for lyrics in songLyricsNonEmpty]
 songLyricsNonEmpty
@@ -182,12 +142,10 @@ wordFrequency = testPlaylist.getWordCounts()
 wordFrequency
 #############################################################
 
-
 ### Get the words showing in all the songs of a playlist ### 20180129
 songList = testPlaylist.getTfidf()#.drop("F**kin' Problems",axis=0)
 songList.T[songList.apply(lambda col: col.all((0)),axis=0)]
 
 #wc1 = WordCloud().generate(wc_corpus)
 #wc1.to_image().show()
-
 ################################################################################################
