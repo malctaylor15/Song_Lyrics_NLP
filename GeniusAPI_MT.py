@@ -39,14 +39,12 @@ def text_cleaner(text):
     This function removes various elements from a text.
     It will remove text inside brackets, commas and changes new lines to spaces
     """
-    #print("Running text_cleaner()...") # For Testing
+    print("Running text_cleaner()...") # For Testing
     lem = WordNetLemmatizer() # Create a lemmatization object
     text = text.lower()
     tokenizer = RegexpTokenizer(r'\w+')
     tokens = tokenizer.tokenize(text)
     filtered_words = [lem.lemmatize(w) for w in tokens if not w in stopwords.words('english')]
-    filtered_wordsTEST = [[w, lem.lemmatize(w)] for w in tokens if not w in stopwords.words('english')] # For Testing 20180130
-    #print(filtered_wordsTEST) # For Testing 20180130
     return " ".join(filtered_words)
 
 

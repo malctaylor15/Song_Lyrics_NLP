@@ -22,25 +22,31 @@ import Spotify_Pulls
 reload(Spotify_Pulls)
 from Spotify_Pulls import *
 
+import song
+reload(song)
 from song import song
+
+import playlist
+reload(playlist)
 from playlist import playlist
 
+
 # Get user playlist information from spotify
-username = '1282829978'  #TODO: Make user input
+username = 'malchemist02'  #TODO: Make user input
 scope = 'user-library-read playlist-read-private user-top-read' #the permissions to give our application
 token = util.prompt_for_user_token(username,scope)
 sp = spotipy.Spotify(auth=token)
-playlists = sp.user_playlists(username)
 
 # Look at user playlist name, number of tracks, and spotify tracklist id
+"""
 playlists_info = get_user_playlists_2(username, playlists)
 print(playlists_info)
 type(playlists_info)
-
-
-spotify_tracklist_id = playlists_info.Tracklist_id.loc[3]
+playlists_info = playlists_info.set_index('Name')
+spotify_tracklist_id = playlists_info.Tracklist_id.loc['Spotify.Me']
 print(spotify_tracklist_id)
 tracklist = get_tracklist_class(spotify_tracklist_id, username, sp) # Look at songs in playlist
+"""
 
 #############################################
 #### Begin Testing class functionalities ####
@@ -50,44 +56,40 @@ tracklist = get_tracklist_class(spotify_tracklist_id, username, sp) # Look at so
 testSong = song('Free Bird', 'Lynyrd Skynyrd') #instantiate a song class object
 testSong.getSentiment()
 testSong.showWordCloud()
+testSong.getWordCounts()[testSong.getWordCounts() > 3]
 print(testSong.polarity) # Same as getSentiment()
 # running getSentiment will define song class attribute polarity
 
 
 ############################################################
 
-### Testing playlist class object funcTIonality
-playlists = sp.category_playlists('hiphop')
+### Testing playlist class object functionality
 
-# NOTE... can delete later
-[key for key in playlists.keys()]
-[key for key in playlists['playlists'].keys()]
-[key for key in playlists['playlists']['items']]
-[key for key in playlists['playlists']['items'][0].keys()]
+#playlists = sp.category_playlists('hiphop')
+playlists = sp.user_playlists(username)
 
 # Now has list with name and id
 playlist_name_id = [(key['name'],  key['owner']['id'],key['tracks']['total'] , key['id']) \
-                    for key in playlists['playlists']['items']]
-
+                    for key in playlists['items']]
 playlist_info = pd.DataFrame(playlist_name_id, columns = ["Name", "Owner", "Number_of_tracks", "Tracklist_id"])
-playlist_info
+playlist_info.columns
 
-# NOTE... can delete later
-playlist_info[playlist_info.Name == "Gold School"].Tracklist_id
 
-# Way two
-playlist_info.index = playlist_info.Name
-playlist_info.loc["Gold School"].Tracklist_id
-playlist_info.loc["Gold School"].Owner
+playlist_name = "May 2015"
+playlist_info = playlist_info.set_index('Name')
 
-testPlaylist = playlist('37i9dQZF1DX0XUsuxWHRQd', 'spotify', sp)
 
+testPlaylist = playlist(playlist_info.loc[playlist_name].Tracklist_id, playlist_info.loc[playlist_name].Owner, sp)
+
+### Start playlist analysis ###
 playlist_sent_l = [(song.title, song.artist, len(song.lyrics.split()), song.getSentiment()) for song in testPlaylist.listOfSongs ]
 song_name_sent = pd.DataFrame(playlist_sent_l, columns = ["Title", "Artist", "Numb_words_in_song" ,"Sentiment"])
 song_name_sent.sort_values("Sentiment", ascending = False)
 # Songs without sentiment
 good_songs = song_name_sent[song_name_sent.Sentiment != 0]
 
+# Number songs dropped
+len(playlist_sent_l) - len(good_songs)
 # Number of songs before
 len(playlist_sent_l)
 # Number of songs after
@@ -104,15 +106,34 @@ good_songs.Sentiment.plot(kind = "hist")
 
 
 artist_gb = good_songs.groupby("Artist")
+
 # NOTE... can delete later
-artist_count_all = artist_gb.Title.count() # Not what I wanted but good example
+artist_count_all = artist_gb.Title.count() # Not what I wanted but g
+artist_count_all
+#good example
 # Applies count to all columns .. only want to count titles
 # Not sure how to do but...
 
 artist_count2 = artist_gb.agg({"Title": "count", "Sentiment":"mean"})[artist_gb.count().Title > 1].sort_values("Sentiment", ascending = False)
-
 artist_count2
 
+# Song analysis
+song_demo = testPlaylist.listOfSongs[1]
+song_demo.getWordCounts()
+song_demo.title
+
+vect = CountVectorizer()
+words = [word for word in song_demo.lyrics.split()]
+
+len([word for word in song_demo.lyrics.split() if word == "tu"])
+
+
+words[:4]
+[song_demo.lyrics]
+feats = vect.fit_transform([song_demo.lyrics]).toarray()[0]
+
+pd.Series(feats, index = vect.get_feature_names()).T.sort_values(ascending = False)
+feats
 
 ###20180206 testing ###
 from nltk.corpus import words
