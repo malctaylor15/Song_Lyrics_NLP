@@ -20,7 +20,7 @@ class song:
         Creates a song object using the title and artist for a song
         This will get the lyrics and create TextBlob object
         """
-        print("Instantiating a song...")
+        #print("Instantiating a song...") # For testing
         self.title = title
         self.artist = artist
         self.lyrics = get_song_lyrics(self.artist, self.title, headers = headers)
@@ -57,7 +57,7 @@ class song:
 
     def getWordCounts(self):
         """
-        Counts the number of times a word is in a song 
+        Counts the number of times a word is in a song
         """
         vectorizer = CountVectorizer()
         feats = vectorizer.fit_transform([self.lyrics]).toarray()[0]

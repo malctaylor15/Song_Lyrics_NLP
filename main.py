@@ -37,52 +37,75 @@ scope = 'user-library-read playlist-read-private user-top-read' #the permissions
 token = util.prompt_for_user_token(username,scope)
 sp = spotipy.Spotify(auth=token)
 
-#############################################
-#### Begin Testing class functionalities ####
-#############################################
+###############################
+#### Class functionalities ####
+###############################
 
-### Song Object Functionality ###
+#####################
+# Song Class Object #
+#####################
+
 testSong = song('Free Bird', 'Lynyrd Skynyrd') #instantiate a song class object
-testSong.getSentiment()
+testSong.getSentiment() # Defines a song class attribute 'polarity'
 testSong.showWordCloud()
 testSong.getWordCounts()[testSong.getWordCounts() > 3]
-print(testSong.polarity) # Same as getSentiment()
-# running getSentiment will define song class attribute polarity
+print("Test Song Polarity: %s" % testSong.polarity) # Prints same result as getSentiment() calculates
 
-############################################################
+#########################
+# Playlist class object #
+#########################
 
-### Testing playlist class object functionality
+### Create dataframe of playlists for the user ###
 
-#playlists = sp.category_playlists('hiphop')
-playlists = sp.user_playlists(username)
-
+#playlists = sp.category_playlists('hiphop') # For using the genre playlists from spotify
+playlists = sp.user_playlists(username) # Returns list of playlists & metadata for the provided user
 # Now has list with name and id
 playlist_name_id = [(key['name'],  key['owner']['id'], key['tracks']['total'], key['id']) \
                     for key in playlists['items']] # Extract the metadata for each song of the playlist
 playlist_name_id
 playlist_info = pd.DataFrame(playlist_name_id, columns = ["Name", "Owner", "Number_of_tracks", "Tracklist_id"]) # Set the column names for the playlist metadata
 playlist_info.columns
-
+playlist_info
 playlist_name = "May 2015"
 playlist_info = playlist_info.set_index('Name')
 
+### END Create dataframe of playlists for the user ###
+#[playlist(playlist_info.loc[playlist_name].Tracklist_id, playlist_info.loc[playlist_name].Owner, sp) for ]
 testPlaylist = playlist(playlist_info.loc[playlist_name].Tracklist_id, playlist_info.loc[playlist_name].Owner, sp)
-
-### Start playlist analysis ###
-playlist_sent_l = [(song.title, song.artist, len(song.lyrics.split()), song.getSentiment()) for song in testPlaylist.listOfSongs ]
-song_name_sent = pd.DataFrame(playlist_sent_l, columns = ["Title", "Artist", "Numb_words_in_song" ,"Sentiment"]) # Creating dataframe from running the song class on each song of the playlist given
-song_name_sent.sort_values("Sentiment", ascending = False)
-
-good_songs = song_name_sent[song_name_sent.Sentiment != 0] # Filters out songs w/o sentiment
+"""### 20180301 ###
+playlists = list(playlist_info.index)
+playlist_info[0:1].index.name
+testCompiled = pd.DataFrame()
+end = 0
+for cat in playlists:
+    if end != 2:
+        playlist_name = cat
+        testPlaylist = playlist(playlist_info.loc[playlist_name].Tracklist_id, playlist_info.loc[playlist_name].Owner, sp)
+        playlist_metadata = [(song.title, song.artist, len(song.lyrics.split()), song.getSentiment()) for song in testPlaylist.listOfSongs ]
+        playlist_metadata_df = pd.DataFrame(playlist_metadata, columns = ["Title", "Artist", "numb_words" ,"Sentiment"])
+        playlist_metadata_df.sort_values("Sentiment", ascending = False)
+        playlist_clean = playlist_metadata_df[playlist_metadata_df.Sentiment != 0]
+        testCompiled.append(playlist_clean, ignore_index='true')
+        end += 1
+    else:
+        break
+testCompiled"""
+### Playlist analysis ###
+playlist_metadata = [(song.title, song.artist, len(song.lyrics.split()), song.getSentiment()) for song in testPlaylist.listOfSongs ]
+# Reformat the playlist metadata as a list of items to be turned to a dataframe in the next lineplaylist_metadata
+playlist_metadata_df = pd.DataFrame(playlist_metadata, columns = ["Title", "Artist", "numb_words" ,"Sentiment"]) # Creating dataframe from running the song class on each song of the playlist given
+playlist_metadata_df.sort_values("Sentiment", ascending = False)
+good_songs = playlist_metadata_df[playlist_metadata_df.Sentiment != 0] # Filters out songs w/o sentiment
+good_songs
 
 # Number songs dropped
-len(playlist_sent_l) - len(good_songs)
+len(playlist_metadata) - len(good_songs)
 # Number of songs before
-len(playlist_sent_l)
+len(playlist_metadata)
 # Number of songs after
 len(good_songs)
 # Percentage drop
-(1 - len(good_songs)/len(playlist_sent_l))*100
+(1 - len(good_songs)/len(playlist_metadata))*100
 
 
 good_songs.Numb_words_in_song.describe()
@@ -148,4 +171,5 @@ songList.T[songList.apply(lambda col: col.all((0)),axis=0)]
 
 #wc1 = WordCloud().generate(wc_corpus)
 #wc1.to_image().show()
-################################################################################################
+
+### END PLaylist analysis ###

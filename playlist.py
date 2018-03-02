@@ -1,5 +1,3 @@
-
-
 from wordcloud import WordCloud
 from textblob import TextBlob
 
@@ -29,7 +27,7 @@ class playlist:
         Creating a playlist class will initialize the list of song (class) and
         concatentate all the lyrics from each song
         """
-        print("Instantiating a playlist...")
+        #print("Instantiating a playlist...")
         self.username = username
         self.tracklist_id = tracklist_id
         self.listOfSongs = get_tracklist_class(self.tracklist_id, self.username, sp)

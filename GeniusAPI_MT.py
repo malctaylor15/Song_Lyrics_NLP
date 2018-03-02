@@ -39,7 +39,7 @@ def text_cleaner(text):
     This function removes various elements from a text.
     It will remove text inside brackets, commas and changes new lines to spaces
     """
-    print("Running text_cleaner()...") # For Testing
+    #print("Running text_cleaner()...") # For Testing
     lem = WordNetLemmatizer() # Create a lemmatization object
     text = text.lower()
     tokenizer = RegexpTokenizer(r'\w+')
@@ -66,7 +66,7 @@ def get_song_lyrics(artist_name, song_title, headers):
     """
     #print("Running get_song_lyrics()...") # For testing
     base_url = 'https://api.genius.com'
-    #song_title = "Lake Song"
+    #song_title = "Lake Song" # For testing
     params = {'q': song_title}
     search_url = base_url + '/search'
 
