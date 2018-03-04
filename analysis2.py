@@ -80,7 +80,7 @@ len(similiar_artists)
 similiar_artists
 
 # TODO: add remove 0 sentiment flag to getSentiment function
-# Should be an optional flag to not include seniment in list if sentiment is 0 
+# Should be an optional flag to not include seniment in list if sentiment is 0
 sentiments_1 = playlist1.getSentimentList()
 sentiments_2 = playlist2.getSentimentList()
 np.mean(sentiments_1)
