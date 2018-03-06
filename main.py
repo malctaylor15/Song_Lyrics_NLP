@@ -51,6 +51,18 @@ testSong.showWordCloud()
 testSong.getWordCounts()[testSong.getWordCounts() > 3]
 print("Test Song Polarity: %s" % testSong.polarity) # Prints same result as getSentiment() calculates
 
+
+sp.search("Free Bird")
+testSong1 = song('Free Bird', 'Lynyrd Skynyrd', sp=sp, spotify_id = "5EWPGh7jbTNO2wakv8LjUI")
+testSong1.audioFeatures
+
+testSong1.getSentiment()
+
+dir(testSong1)
+testSong1.audioFeatures
+
+
+
 #########################
 # Playlist class object #
 #########################
@@ -85,10 +97,9 @@ for cat in playlists:
         playlist_metadata_df = pd.DataFrame(playlist_metadata, columns = ["Title", "Artist", "numb_words" ,"Sentiment"])
         playlist_metadata_df.sort_values("Sentiment", ascending = False)
         playlist_clean = playlist_metadata_df[playlist_metadata_df.Sentiment != 0]
-        testCompiled.append(playlist_clean, ignore_index='true')
+        testCompiled = testCompiled.append(playlist_clean, ignore_index='true')
         end += 1
-    else:
-        break
+
 testCompiled"""
 ### Playlist analysis ###
 playlist_metadata = [(song.title, song.artist, len(song.lyrics.split()), song.getSentiment()) for song in testPlaylist.listOfSongs ]

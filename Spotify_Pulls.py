@@ -91,7 +91,7 @@ def get_tracklist_class(tracklist_id, username, sp):
     tracks = results['tracks']
     for i, item in enumerate(tracks['items']):
         track = item['track']
-        song_temp = song(track['name'], track['artists'][0]['name'])
+        song_temp = song(track['name'], track['artists'][0]['name'], sp = sp, spotify_id = track['id'])
         allTracks.append(song_temp)
     return allTracks
 

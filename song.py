@@ -15,7 +15,7 @@ import pandas as pd
 
 
 class song:
-    def __init__(self, title, artist):
+    def __init__(self, title, artist, **kwargs):
         """
         Creates a song object using the title and artist for a song
         This will get the lyrics and create TextBlob object
@@ -24,6 +24,17 @@ class song:
         self.title = title
         self.artist = artist
         self.lyrics = get_song_lyrics(self.artist, self.title, headers = headers)
+        keywords_for_spotifyid = ["spotify_id", "sp"]
+
+        if all([x in kwargs.keys() for x in keywords_for_spotifyid]):
+            sp = kwargs["sp"]
+            spotify_id = kwargs["spotify_id"]
+            print("Spotify id: ", spotify_id)
+
+            self.audioFeatures = sp.audio_features(spotify_id)[0]
+
+
+
         if self.lyrics == ():
             print("No lyrics found. Not creating TextBlob Object")
         else:
