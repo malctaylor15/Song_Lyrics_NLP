@@ -45,23 +45,11 @@ sp = spotipy.Spotify(auth=token)
 # Song Class Object #
 #####################
 
-testSong = song('Free Bird', 'Lynyrd Skynyrd') #instantiate a song class object
+"""testSong = song('Free Bird', 'Lynyrd Skynyrd') #instantiate a song class object
 testSong.getSentiment() # Defines a song class attribute 'polarity'
 testSong.showWordCloud()
 testSong.getWordCounts()[testSong.getWordCounts() > 3]
-print("Test Song Polarity: %s" % testSong.polarity) # Prints same result as getSentiment() calculates
-
-
-sp.search("Free Bird")
-testSong1 = song('Free Bird', 'Lynyrd Skynyrd', sp=sp, spotify_id = "5EWPGh7jbTNO2wakv8LjUI")
-testSong1.audioFeatures
-
-testSong1.getSentiment()
-
-dir(testSong1)
-testSong1.audioFeatures
-
-
+print("Test Song Polarity: %s" % testSong.polarity) # Prints same result as getSentiment() calculates"""
 
 #########################
 # Playlist class object #
@@ -84,13 +72,13 @@ playlist_info = playlist_info.set_index('Name')
 ### END Create dataframe of playlists for the user ###
 #[playlist(playlist_info.loc[playlist_name].Tracklist_id, playlist_info.loc[playlist_name].Owner, sp) for ]
 testPlaylist = playlist(playlist_info.loc[playlist_name].Tracklist_id, playlist_info.loc[playlist_name].Owner, sp)
-"""### 20180301 ###
+### 20180301 ###
 playlists = list(playlist_info.index)
 playlist_info[0:1].index.name
-testCompiled = pd.DataFrame()
+testCompiled = pd.DataFrame(columns=['Title','Artist', 'numb_words', 'Sentiment'])
 end = 0
 for cat in playlists:
-    if end != 2:
+    if end != 3:
         playlist_name = cat
         testPlaylist = playlist(playlist_info.loc[playlist_name].Tracklist_id, playlist_info.loc[playlist_name].Owner, sp)
         playlist_metadata = [(song.title, song.artist, len(song.lyrics.split()), song.getSentiment()) for song in testPlaylist.listOfSongs ]
@@ -99,8 +87,10 @@ for cat in playlists:
         playlist_clean = playlist_metadata_df[playlist_metadata_df.Sentiment != 0]
         testCompiled = testCompiled.append(playlist_clean, ignore_index='true')
         end += 1
-
-testCompiled"""
+    else:
+        continue
+testCompiled
+good_songs = testCompiled
 ### Playlist analysis ###
 playlist_metadata = [(song.title, song.artist, len(song.lyrics.split()), song.getSentiment()) for song in testPlaylist.listOfSongs ]
 # Reformat the playlist metadata as a list of items to be turned to a dataframe in the next lineplaylist_metadata
@@ -119,8 +109,8 @@ len(good_songs)
 (1 - len(good_songs)/len(playlist_metadata))*100
 
 
-good_songs.Numb_words_in_song.describe()
-good_songs.Numb_words_in_song.plot(kind = "hist")
+good_songs.numb_words.describe()
+good_songs.numb_words.plot(kind = "hist")
 
 good_songs.Sentiment.mean()
 good_songs.Sentiment.plot(kind = "hist")
@@ -132,7 +122,7 @@ artist_count_all
 
 ### Gather the average sentiment for the songs of an artist with mroe than 1 song###
 artist_count2 = artist_gb.agg({"Title": "count", "Sentiment":"mean"})[artist_gb.count().Title > 1].sort_values("Sentiment", ascending = False)
-artist_count2
+artist_count2.sort_values(by="Title",ascending=False)
 
 ### Song analysis ###
 song_demo = testPlaylist.listOfSongs[1]
