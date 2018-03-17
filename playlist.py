@@ -32,6 +32,7 @@ class playlist:
         self.tracklist_id = tracklist_id
         self.listOfSongs = get_tracklist_class(self.tracklist_id, self.username, sp)
         self.allLyrics = get_tracklist_lyrics(self.listOfSongs)
+        self.songNames = [song.title for song in self.listOfSongs]
 
     def showWordCloud(self):
         self.wc = WordCloud().generate(self.allLyrics)
@@ -72,7 +73,7 @@ class playlist:
         self.songNames = [song.title for song in self.listOfSongs]
         #del songNames[0] delete later if not needed
         #del self.songLyricsList[0]  delete later if not needed
-        vect = CountVectorizer()
+        vect = CountVectorizer(max_features = numb_words)
         vectWordFreq = vect.fit_transform(self.songLyricsList).toarray()
         self.vectNames = vect.get_feature_names()
         self.vectdf = pd.DataFrame(vectWordFreq,columns = self.vectNames, index=self.songNames)
