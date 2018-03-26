@@ -11,21 +11,24 @@ clf.predict_proba([[2., 2.]])
 ### DataAspirant###
 import numpy as np
 import pandas as pd
+from pprint import pprint as pp
 from sklearn.cross_validation import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score
 from sklearn import tree
 balance_data = pd.read_csv('https://archive.ics.uci.edu/ml/machine-learning-databases/balance-scale/balance-scale.data', sep= ',', header= None)
 
+# inspecting
 print("Length", len(balance_data))
 print("Shape: ", balance_data.shape)
-
 balance_data.head()
+#
 
+## Example of portion of train_test_split() method
 X = balance_data.values[:, 1:5]
 Y = balance_data.values[:, 0]
-X
-Y
+##
+
 
 X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size = 0.3, random_state = 100)
 
