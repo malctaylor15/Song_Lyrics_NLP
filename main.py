@@ -12,6 +12,11 @@ import matplotlib.pyplot as plt
 # Spotify API
 import spotipy
 import spotipy.util as util
+#nltk.download("stopwords")
+#nltk.download("wordnet")
+#nltk.download("punkt")
+
+
 
 from importlib import reload
 import GeniusAPI_MT
@@ -64,14 +69,18 @@ playlist_name_id = [(key['name'],  key['owner']['id'], key['tracks']['total'], k
                     for key in playlists['items']] # Extract the metadata for each song of the playlist
 playlist_name_id
 playlist_info = pd.DataFrame(playlist_name_id, columns = ["Name", "Owner", "Number_of_tracks", "Tracklist_id"]) # Set the column names for the playlist metadata
-playlist_info.columns
-playlist_info
-playlist_name = "May 2015"
 playlist_info = playlist_info.set_index('Name')
+playlist_info.columns
+keyword = "Feb"
+[x for x in playlist_info.index if keyword in x]
+playlist_info
+playlist_name = "February 2018"
 
 ### END Create dataframe of playlists for the user ###
 #[playlist(playlist_info.loc[playlist_name].Tracklist_id, playlist_info.loc[playlist_name].Owner, sp) for ]
 testPlaylist = playlist(playlist_info.loc[playlist_name].Tracklist_id, playlist_info.loc[playlist_name].Owner, sp)
+
+
 ### 20180301 ###
 playlists = list(playlist_info.index)
 playlist_info[0:1].index.name
@@ -174,3 +183,57 @@ songList.T[songList.apply(lambda col: col.all((0)),axis=0)]
 #wc1.to_image().show()
 
 ### END PLaylist analysis ###
+
+
+
+
+
+######## 05172018
+
+type(testPlaylist)
+dir(testPlaylist)
+# Get word frequency of top 200 words
+testPlaylist.wordFrequency.shape
+testPlaylist.wordFrequency
+top_words = testPlaylist.wordFrequency.columns.tolist()
+top_words
+
+
+
+
+!pwd
+glove_filepath = "/home/malcolm/Downloads/glove.6B.50d.txt"
+os.path.isfile(glove_filepath)
+
+
+cutoff = None # 400000 # max
+# only 198 match
+with open(glove_filepath, 'r+', encoding='utf-8') as fp:
+    i = 0
+    embed_dict = {}
+    for line in fp:
+        split_line = line.split()
+        if split_line[0] in top_words:
+            embed_dict[split_line[0]] = split_line[0:]
+        i +=1
+        if i % 50 ==0 :
+            print("Looked through ", i, " words")
+        if i == cutoff: break
+        if len(embed_dict) == len(top_words): break
+
+len(embed_dict)
+set(list(embed_dict)).symmetric_difference(top_words)
+
+list(embed_dict.keys())
+
+embed_pd = pd.DataFrame(embed_dict)
+embed_pd = embed_pd.T
+embed_pd.set_index(embed_pd.iloc[:,0], inplace = True)
+
+embed_pd.shape
+embed_pd.head()
+
+
+
+# Find a word using .loc
+#embed_pd.loc["much"]
