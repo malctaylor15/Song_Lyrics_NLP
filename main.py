@@ -39,7 +39,8 @@ from playlist import playlist
 
 
 # Get user playlist information from spotify
-username = 'malchemist02'  #TODO: Make user input
+#username = 'malchemist02'  #TODO: Make user input
+username = "1282829978"
 scope = 'user-library-read playlist-read-private user-top-read' #the permissions to give our application
 token = util.prompt_for_user_token(username,scope)
 sp = spotipy.Spotify(auth=token)
@@ -73,15 +74,15 @@ playlist_name_id
 playlist_info = pd.DataFrame(playlist_name_id, columns = ["Name", "Owner", "Number_of_tracks", "Tracklist_id"]) # Set the column names for the playlist metadata
 playlist_info = playlist_info.set_index('Name')
 playlist_info.columns
-keyword = "Feb"
+keyword = "Sing"
 [x for x in playlist_info.index if keyword in x]
 playlist_info
-playlist_name = "February 2018"
+playlist_name = "Discover Weekly Archive"
 
 ### END Create dataframe of playlists for the user ###
 #[playlist(playlist_info.loc[playlist_name].Tracklist_id, playlist_info.loc[playlist_name].Owner, sp) for ]
-testPlaylist = playlist(playlist_info.loc[playlist_name].Tracklist_id, playlist_info.loc[playlist_name].Owner, sp)
-
+#testPlaylist = playlist(playlist_info.loc[playlist_name].Tracklist_id, playlist_info.loc[playlist_name].Owner, sp)
+testPlaylist = playlist("37i9dQZF1DWWMOmoXKqHTD", "spotify", sp)
 
 ### 20180301 ###
 # Combine multiple playlist?
@@ -134,7 +135,7 @@ good_songs.Sentiment.plot(kind = "hist")
 ###Gather song count by artist###
 artist_gb = good_songs.groupby("Artist")
 artist_count_all = artist_gb.Title.count() # Not what I wanted but g
-artist_count_all
+np.sort(artist_count_all)
 
 ### Gather the average sentiment for the songs of an artist with mroe than 1 song###
 artist_count2 = artist_gb.agg({"Title": "count", "Sentiment":"mean"})[artist_gb.count().Title > 1].sort_values("Sentiment", ascending = False)
@@ -203,15 +204,31 @@ type(testPlaylist)
 dir(testPlaylist)
 # Get word frequency of top 200 words
 testPlaylist.wordFrequency.shape
-word_freq_count = testPlaylist.wordFrequency.sum(axis=0)
+word_freq = testPlaylist.wordFrequency
+
+word_freq_count = word_freq.sum(axis=0)
 word_freq_count = word_freq_count.sort_values(ascending=False)
-top_words = word_freq_count.index.tolist()
+
+song_freq_count = word_freq.sum(axis=1)
+song_freq_count = song_freq_count.sort_values(ascending=False)
+
+# Drop songs with no words
+word_freq = word_freq.drop([x[0] for x in song_freq_count.iteritems() if x[1] == 0],axis = 0)
+song_freq_count2 = song_freq_count[song_freq_count != 0]
+len(song_freq_count2)
+song_freq_count.shape
+word_freq.shape
+word_freq
+
+song_freq_count.head()
 word_freq_count.head()
+top_words = word_freq_count.index.tolist()
+
 
 
 
 !pwd
-glove_filepath = "/home/malcolm/Downloads/glove.6B.50d.txt"
+glove_filepath = "/home/owner/Downloads/glove.6B.50d.txt"
 os.path.isfile(glove_filepath)
 
 
@@ -226,7 +243,7 @@ with open(glove_filepath, 'r+', encoding='utf-8') as fp:
         if split_line[0] in top_words:
             embed_dict[split_line[0]] = split_line[0:]
         i +=1
-        if i % 1000 ==0 :
+        if i % 4000 ==0 :
             print("Looked through ", i, " words")
         if i == cutoff: break
         if len(embed_dict) == len(top_words): break
@@ -252,7 +269,7 @@ embed_pd2.head(10)
 
 from scipy.spatial.distance import cosine
 
-# Of the top words in the songs, which are closest according to wikipedia 
+# Of the top words in the playlist, which are closest according to wikipedia
 len(embed_pd2.index) # number of apply loops n x n computations
 cosine_dict = {}
 for word in embed_pd2.index:
@@ -262,7 +279,49 @@ for word in embed_pd2.index:
 
 
 list(cosine_dict.keys())
-check_word = "bang"
+check_word = "girl"
 check_word in embed_pd2.index
+cosine_dict[check_word][:10]
 
-cosine_dict[check_word][:5]
+## 05192017
+
+embed_pd2.shape
+embed_pd2.head()
+word_freq.shape
+word_match_freq = word_freq.drop([col for col in word_freq.columns \
+if col not in list(embed_dict.keys())],axis = 1)
+word_freq.head()
+song_embeds = word_match_freq.dot(embed_pd2)
+song_embeds.head()
+song_embeds
+
+song_freq_count.head()
+song_freq_count.shape
+song_embeds.shape
+
+# Normalize embededdings -- some songs have more words than others
+norm_song_embeds = song_embeds.divide(song_freq_count2, axis = 0)
+
+norm_song_embeds.head()
+
+song_cosine_dict = {}
+for song in norm_song_embeds.index:
+    embed_check = norm_song_embeds.loc[song]
+    temp_single_cosine_list = norm_song_embeds.apply(lambda x: 1 - cosine(x, embed_check), axis = 1)
+    song_cosine_dict[song] = temp_single_cosine_list.sort_values(ascending = False)
+
+# Songs that are similar to each other
+[(song, x[:5]) for song, x in song_cosine_dict.items()]
+# Song that are dissimilar to each other
+[(song, x[-5:]) for song, x in song_cosine_dict.items()]
+
+
+"""
+# Check that song with na in vector had 0 words before
+# TODO: Remove songs with 0 words (from top 200) earlier
+no_words_songs = song_freq_count[song_freq_count == 0]
+songs_with_nulls = norm_song_embeds.iloc[:,0].isna()
+temp_nas = songs_with_nulls[songs_with_nulls == True]
+set(list(no_words_songs.index)).symmetric_difference(list(temp_nas.index))
+
+"""
