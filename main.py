@@ -16,6 +16,8 @@ import spotipy.util as util
 #nltk.download("wordnet")
 #nltk.download("punkt")
 
+# Word embeddings
+# https://nlp.stanford.edu/projects/glove/
 
 
 from importlib import reload
@@ -82,6 +84,9 @@ testPlaylist = playlist(playlist_info.loc[playlist_name].Tracklist_id, playlist_
 
 
 ### 20180301 ###
+# Combine multiple playlist?
+# Put into separate file for functionality MT_05182018
+"""
 playlists = list(playlist_info.index)
 playlist_info[0:1].index.name
 testCompiled = pd.DataFrame(columns=['Title','Artist', 'numb_words', 'Sentiment'])
@@ -100,6 +105,8 @@ for cat in playlists:
         continue
 testCompiled
 good_songs = testCompiled
+"""
+
 ### Playlist analysis ###
 playlist_metadata = [(song.title, song.artist, len(song.lyrics.split()), song.getSentiment()) for song in testPlaylist.listOfSongs ]
 # Reformat the playlist metadata as a list of items to be turned to a dataframe in the next lineplaylist_metadata
@@ -185,7 +192,9 @@ songList.T[songList.apply(lambda col: col.all((0)),axis=0)]
 ### END PLaylist analysis ###
 
 
-
+################################
+###### Embeddings Analysis #####
+################################
 
 
 ######## 05172018
@@ -194,10 +203,10 @@ type(testPlaylist)
 dir(testPlaylist)
 # Get word frequency of top 200 words
 testPlaylist.wordFrequency.shape
-testPlaylist.wordFrequency
-top_words = testPlaylist.wordFrequency.columns.tolist()
-top_words
-
+word_freq_count = testPlaylist.wordFrequency.sum(axis=0)
+word_freq_count = word_freq_count.sort_values(ascending=False)
+top_words = word_freq_count.index.tolist()
+word_freq_count.head()
 
 
 
@@ -207,7 +216,8 @@ os.path.isfile(glove_filepath)
 
 
 cutoff = None # 400000 # max
-# only 198 match
+
+# Read in the embeddings from the top words list
 with open(glove_filepath, 'r+', encoding='utf-8') as fp:
     i = 0
     embed_dict = {}
@@ -216,24 +226,43 @@ with open(glove_filepath, 'r+', encoding='utf-8') as fp:
         if split_line[0] in top_words:
             embed_dict[split_line[0]] = split_line[0:]
         i +=1
-        if i % 50 ==0 :
+        if i % 1000 ==0 :
             print("Looked through ", i, " words")
         if i == cutoff: break
         if len(embed_dict) == len(top_words): break
 
+# Validate embeddings
 len(embed_dict)
 set(list(embed_dict)).symmetric_difference(top_words)
+#list(embed_dict.keys())
 
-list(embed_dict.keys())
-
+# Turn embeddings into dictionary
 embed_pd = pd.DataFrame(embed_dict)
 embed_pd = embed_pd.T
 embed_pd.set_index(embed_pd.iloc[:,0], inplace = True)
+embed_pd.drop([0], axis = 1, inplace = True)
+embed_pd2 = embed_pd.apply(pd.to_numeric)
 
-embed_pd.shape
-embed_pd.head()
-
-
+embed_pd2.shape
+embed_pd2.head(10)
 
 # Find a word using .loc
 #embed_pd.loc["much"]
+
+
+from scipy.spatial.distance import cosine
+
+# Of the top words in the songs, which are closest according to wikipedia 
+len(embed_pd2.index) # number of apply loops n x n computations
+cosine_dict = {}
+for word in embed_pd2.index:
+    embed_check = embed_pd2.loc[word]
+    temp_single_cosine_list = embed_pd2.apply(lambda x: 1 - cosine(x, embed_check), axis = 1)
+    cosine_dict[word] = temp_single_cosine_list.sort_values(ascending = False)
+
+
+list(cosine_dict.keys())
+check_word = "bang"
+check_word in embed_pd2.index
+
+cosine_dict[check_word][:5]
