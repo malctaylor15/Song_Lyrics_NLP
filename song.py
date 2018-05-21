@@ -29,7 +29,7 @@ class song:
         if all([x in kwargs.keys() for x in keywords_for_spotifyid]):
             sp = kwargs["sp"]
             spotify_id = kwargs["spotify_id"]
-            print("Found ", title, " by ", artist, ". It has a spotify id")
+            #print("Found ", title, " by ", artist, ". It has a spotify id")
 
             self.audioFeatures = sp.audio_features(spotify_id)[0]
 

@@ -61,11 +61,15 @@ def get_tracklist(tracklist_id, username):
     allTracks = {}
     results = sp.user_playlist(username, tracklist_id, fields="tracks")
     tracks = results['tracks']
+    print("There are ", len(tracks["items"]), " in playlist")
+    n = 0
     for i, item in enumerate(tracks['items']):
         track = item['track']
         trackName = track['name']
         trackArtist = track['artists'][0]['name']
         allTracks[trackName] = trackArtist
+        n +=1
+        if n % 10 ==0: print("Finished ", n, " songs")
     pp(allTracks)
     return allTracks
 
