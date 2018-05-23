@@ -19,66 +19,30 @@ import spotipy.util as util
 # Word embeddings
 # https://nlp.stanford.edu/projects/glove/
 
-
 from importlib import reload
-import GeniusAPI_MT
-reload(GeniusAPI_MT)
-from GeniusAPI_MT import *
 
-import Spotify_Pulls
-reload(Spotify_Pulls)
-from Spotify_Pulls import *
-
-import song
-reload(song)
-from song import song
+import get_playlist
+reload(get_playlist)
+from get_playlist import get_playlist
 
 import playlist
 reload(playlist)
 from playlist import playlist
 
+
 from scipy.spatial.distance import cosine
 
 
 # Get user playlist information from spotify
-#username = 'malchemist02'  #TODO: Make user input
-username = "1282829978"
-scope = 'user-library-read playlist-read-private user-top-read' #the permissions to give our application
-token = util.prompt_for_user_token(username,scope)
-sp = spotipy.Spotify(auth=token)
-
-### Create dataframe of playlists for the user ###
-
-#playlists = sp.category_playlists('hiphop') # For using the genre playlists from spotify
-playlists = sp.user_playlists(username) # Returns list of playlists & metadata for the provided user
-# Now has list with name and id
-playlist_name_id = [(key['name'],  key['owner']['id'], key['tracks']['total'], key['id']) \
-                    for key in playlists['items']] # Extract the metadata for each song of the playlist
-playlist_name_id
-playlist_info = pd.DataFrame(playlist_name_id, columns = ["Name", "Owner", "Number_of_tracks", "Tracklist_id"]) # Set the column names for the playlist metadata
-playlist_info = playlist_info.set_index('Name')
-playlist_info.columns
-keyword = "Sing"
-[x for x in playlist_info.index if keyword in x]
-playlist_info
-playlist_name = "Discover Weekly Archive"
-
-
-#testPlaylist = playlist(playlist_info.loc[playlist_name].Tracklist_id, playlist_info.loc[playlist_name].Owner, sp)
-testPlaylist = playlist("37i9dQZF1DWWMOmoXKqHTD", "spotify", sp)
-
-
+testPlaylist = get_playlist("malchemist02", "Kanye West – The Life Of Pablo")
 
 ######## 05172018
 
 type(testPlaylist)
 dir(testPlaylist)
-# Get word frequency of top 200 words
-# testPlaylist.wordFrequency.shape
-# word_freq = testPlaylist.wordFrequency
-word_freq = testPlaylist.getWordCounts(300)
 
-
+# Get word frequency of top 300 words
+word_freq = testPlaylist.getWordCounts(100)
 
 word_freq_count = word_freq.sum(axis=0)
 word_freq_count = word_freq_count.sort_values(ascending=False)
@@ -97,8 +61,6 @@ word_freq.shape
 # song_freq_count.head()
 # word_freq_count.head()
 top_words = word_freq_count.index.tolist()
-
-
 
 
 
@@ -246,5 +208,55 @@ dir(LinearRegression)
 
 ########### Use a cosine similarity as dep var... compare performance
 song_cosine_dict.keys()
-dep_var2 = song_cosine_dict["All of Me"]
-dep_var2.join(...)
+dep_var2 = song_cosine_dict["30 Hours"]
+
+dep_var2.head()
+norm_song_embeds.head()
+
+# Create embedding dataframe
+dep_embedding = pd.concat([dep_var2, norm_song_embeds], axis = 1)
+dep_embedding.rename(columns = {0:"song_cosine"}, inplace = True)
+
+# Create words DataFrame
+dep_words = pd.concat([dep_var2, word_freq], axis = 1)
+dep_words.rename(columns = {0:"song_cosine"}, inplace = True)
+
+
+X_sc_em =  dep_embedding.drop(["song_cosine"], axis = 1)
+Y_sc_em = dep_embedding["song_cosine"]
+
+X_train, X_test, y_train, y_test = train_test_split(X_sc_em, Y_sc_em)
+
+fit1 = LinearRegression().fit(X_train, y_train)
+fit1.score(X_test, y_test)
+
+X_sc_nw =  dep_words.drop(["song_cosine"], axis = 1)
+Y_sc_nw = dep_words["song_cosine"]
+
+X_train, X_test, y_train, y_test = train_test_split(X_sc_nw, Y_sc_nw)
+fit1 = LinearRegression().fit(X_train, y_train)
+fit1.score(X_test, y_test)
+
+## Naturally the embeddings perform better in this case because they were used
+# In a non linear fashion in creating the depednent
+
+####################
+### Begin Tsnee ####
+####################
+
+from sklearn.manifold import TSNE
+
+norm_song_embeds.shape
+
+new_embeds = TSNE(perplexity = 5).fit_transform(norm_song_embeds)
+new_embeds.shape
+plt.ioff()
+plt.scatter(new_embeds[:,0], new_embeds[:,1])
+
+for label, x, y in zip(norm_song_embeds.index.values, new_embeds[:,0], new_embeds[:,1]):
+    plt.annotate(label, xy = (x,y), xytext = (20,-20),
+    textcoords='offset points', ha='right', va='bottom',
+    bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
+    arrowprops=dict(arrowstyle = '->', connectionstyle='arc3,rad=0'))
+
+plt.show()
