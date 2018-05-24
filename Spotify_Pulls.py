@@ -63,13 +63,14 @@ def get_tracklist(tracklist_id, username):
     tracks = results['tracks']
     print("There are ", len(tracks["items"]), " in playlist")
     n = 0
+    print("There are ", len(tracks['items']), " items in the playlist")
     for i, item in enumerate(tracks['items']):
         track = item['track']
         trackName = track['name']
         trackArtist = track['artists'][0]['name']
         allTracks[trackName] = trackArtist
         n +=1
-        if n % 10 ==0: print("Finished ", n, " songs")
+        if n % 5 ==0: print("Finished ", n, " songs")
     pp(allTracks)
     return allTracks
 
@@ -93,10 +94,15 @@ def get_tracklist_class(tracklist_id, username, sp):
     allTracks = []
     results = sp.user_playlist(username, tracklist_id, fields="tracks")
     tracks = results['tracks']
+    print("There are ", len(tracks['items']), " items in the playlist")
+    n = 0
     for i, item in enumerate(tracks['items']):
         track = item['track']
         song_temp = song(track['name'], track['artists'][0]['name'], sp = sp, spotify_id = track['id'])
         allTracks.append(song_temp)
+        n +=1
+        if n % 5 ==0: print("Finished ", n, " songs")
+    print("Completed getting tracks fro spotify")
     return allTracks
 
 def get_user_playlists_2(username, playlists):

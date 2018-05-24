@@ -118,7 +118,7 @@ for word in embed_pd2.index:
 
 
 list(cosine_dict.keys())
-check_word = "girl"
+check_word = "night"
 check_word in embed_pd2.index
 cosine_dict[check_word][:10]
 
@@ -245,18 +245,59 @@ fit1.score(X_test, y_test)
 ####################
 
 from sklearn.manifold import TSNE
-
 norm_song_embeds.shape
 
-new_embeds = TSNE(perplexity = 5).fit_transform(norm_song_embeds)
-new_embeds.shape
-plt.ioff()
-plt.scatter(new_embeds[:,0], new_embeds[:,1])
 
-for label, x, y in zip(norm_song_embeds.index.values, new_embeds[:,0], new_embeds[:,1]):
+
+
+new_embeds = TSNE(perplexity = 5, random_state=1).fit_transform(norm_song_embeds)
+new_embeds = pd.DataFrame(new_embeds, index = norm_song_embeds.index)
+plt.ioff()
+plt.scatter(new_embeds.iloc[:,0], new_embeds.iloc[:,1])
+
+for label, x, y in zip(norm_song_embeds.index.values, new_embeds.iloc[:,0], new_embeds.iloc[:,1]):
     plt.annotate(label, xy = (x,y), xytext = (20,-20),
     textcoords='offset points', ha='right', va='bottom',
     bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
     arrowprops=dict(arrowstyle = '->', connectionstyle='arc3,rad=0'))
+
+plt.show()
+
+
+
+from sklearn.cluster import KMeans
+
+n_cluster = 3
+
+cluster_fit = KMeans(n_clusters = n_cluster, random_state=1).fit(new_embeds)
+
+# Combine label and center
+unique_labels = np.sort(np.unique(cluster_fit.labels_))
+centers = cluster_fit.cluster_centers_
+cl_center_dict = {label:center for label, center in zip(unique_labels, centers)}
+
+# Initalize dict for storing distances
+# center_dist = {label: [] for label in cluster_fit.labels_}
+# TODO: make key of center dist a dataframe
+center_dist = {label: pd.DataFrame(columns = ["Distance"]) for label in cluster_fit.labels_}
+
+
+from scipy.spatial.distance import euclidean
+
+# take in pt, cluster center,
+for pt, cl_label,song_name in zip(new_embeds.values, cluster_fit.labels_, new_embeds.index.tolist()):
+
+    pt_center = cl_center_dict[cl_label]
+    dist_from_center = euclidean(pt, pt_center)
+    # center_dist[cl_label].append((song_name, dist_from_center))
+
+    center_dist[cl_label].loc[song_name]= dist_from_center
+
+center_dist[0]
+
+new_embeds
+
+plt.scatter(centers[:,0], centers[:,1], color = "red")
+plt.scatter(new_embeds.iloc[:,0], new_embeds.iloc[:,1])
 
 plt.show()
