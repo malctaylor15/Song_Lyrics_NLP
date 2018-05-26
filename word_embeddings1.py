@@ -245,10 +245,10 @@ fit1.score(X_test, y_test)
 ####################
 
 from sklearn.manifold import TSNE
-norm_song_embeds.shape
+# norm_song_embeds.to_csv("EmbedsForPabloKanye.csv")
 
-
-
+y1 = [x for x in range(0,10)]
+y1[:3]
 
 new_embeds = TSNE(perplexity = 5, random_state=1).fit_transform(norm_song_embeds)
 new_embeds = pd.DataFrame(new_embeds, index = norm_song_embeds.index)
@@ -269,7 +269,7 @@ from sklearn.cluster import KMeans
 
 n_cluster = 3
 
-cluster_fit = KMeans(n_clusters = n_cluster, random_state=1).fit(new_embeds)
+cluster_fit = KMeans(n_clusters = n_cluster, random_state=2).fit(new_embeds)
 
 # Combine label and center
 unique_labels = np.sort(np.unique(cluster_fit.labels_))
@@ -284,7 +284,7 @@ center_dist = {label: pd.DataFrame(columns = ["Distance"]) for label in cluster_
 
 from scipy.spatial.distance import euclidean
 
-# take in pt, cluster center,
+# take in pt, cluster center, song name
 for pt, cl_label,song_name in zip(new_embeds.values, cluster_fit.labels_, new_embeds.index.tolist()):
 
     pt_center = cl_center_dict[cl_label]
@@ -293,11 +293,73 @@ for pt, cl_label,song_name in zip(new_embeds.values, cluster_fit.labels_, new_em
 
     center_dist[cl_label].loc[song_name]= dist_from_center
 
-center_dist[0]
+numb_pts_to_label = 3 # Name top n farthest/closest points from their center
+pts_to_label = pd.DataFrame(columns = ["Distance", "Center"])
+for center_lbl in unique_labels:
+    top_pts_far = center_dist[center_lbl].sort_values(by="Distance", ascending = False)[:3]
+    top_pts_far["Center"] = center_lbl
+    top_pts_near = center_dist[center_lbl].sort_values(by="Distance", ascending = False)[:-3]
 
-new_embeds
+    pts_to_label = pd.concat([pts_to_label, top_pts_far], axis = 0)
+type(top_pts_far)
+
+pts_to_label = pts_to_label.join(new_embeds)
 
 plt.scatter(centers[:,0], centers[:,1], color = "red")
 plt.scatter(new_embeds.iloc[:,0], new_embeds.iloc[:,1])
 
+for label, x, y in zip(pts_to_label.index.tolist(), pts_to_label[0], pts_to_label[1]):
+    plt.annotate(label, xy = (x,y), xytext = (20,-20),
+    textcoords='offset points', ha='right', va='bottom',
+    bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
+    arrowprops=dict(arrowstyle = '->', connectionstyle='arc3,rad=0'))
+
 plt.show()
+
+
+
+#################################
+#################################
+#################################
+
+
+# Name top n farthest/closest points from their center
+pts_to_label = pd.DataFrame(columns = ["Distance", "Close_Far", "Label"])
+for center_lbl in unique_labels:
+    sorted_pts = center_dist[center_lbl].sort_values(by="Distance", ascending = False)
+    # Points far away
+    top_pts_far = sorted_pts[:numb_pts_to_label]
+    top_pts_far["Close_Far"] = "F"
+    # Points closer
+    top_pts_near = sorted_pts[-numb_pts_to_label:]
+    top_pts_near.loc[:,"Close_Far"] = "C"
+    # Combine and add Label
+    pts = top_pts_far.append(top_pts_near).copy()
+    pts.loc[:,"Label"] = np.repeat(center_lbl, pts.shape[0])
+
+    pts_to_label = pd.concat([pts_to_label, pts], axis = 0)
+
+data = new_embeds
+pts_to_label = pts_to_label.join(data)
+
+for center, label in zip(centers, unique_labels):
+    # pts_to_label.loc["Center"+str(label)] = {"Distance":0, "Close_Far":"CC", "Label":label, 0:center}
+    temp_array = [0, "CC", label]
+    for x in center:
+        temp_array.append(x)
+    pts_to_label.loc["Center"+str(label)] = temp_array
+pts_to_label
+
+center_info
+unique_labels
+cluster_fit.cluster_centers_
+
+
+import utils_adv
+reload(utils_adv)
+from utils_adv import *
+
+
+df1 = find_outliers(new_embeds)
+
+df1
