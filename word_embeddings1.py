@@ -362,4 +362,4 @@ from utils_adv import *
 
 df1 = find_outliers(new_embeds)
 
-df1
+plot_TSNE_all_labels(new_embeds, title="Life of Pablo TSNE Embeddings")
