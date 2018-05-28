@@ -19,66 +19,33 @@ import spotipy.util as util
 # Word embeddings
 # https://nlp.stanford.edu/projects/glove/
 
-
 from importlib import reload
-import GeniusAPI_MT
-reload(GeniusAPI_MT)
-from GeniusAPI_MT import *
 
-import Spotify_Pulls
-reload(Spotify_Pulls)
-from Spotify_Pulls import *
-
-import song
-reload(song)
-from song import song
+import get_playlist
+reload(get_playlist)
+from get_playlist import get_playlist
 
 import playlist
 reload(playlist)
 from playlist import playlist
 
+import utils_adv
+reload(utils_adv)
+from utils_adv import *
+
 from scipy.spatial.distance import cosine
 
 
 # Get user playlist information from spotify
-#username = 'malchemist02'  #TODO: Make user input
-username = "1282829978"
-scope = 'user-library-read playlist-read-private user-top-read' #the permissions to give our application
-token = util.prompt_for_user_token(username,scope)
-sp = spotipy.Spotify(auth=token)
-
-### Create dataframe of playlists for the user ###
-
-#playlists = sp.category_playlists('hiphop') # For using the genre playlists from spotify
-playlists = sp.user_playlists(username) # Returns list of playlists & metadata for the provided user
-# Now has list with name and id
-playlist_name_id = [(key['name'],  key['owner']['id'], key['tracks']['total'], key['id']) \
-                    for key in playlists['items']] # Extract the metadata for each song of the playlist
-playlist_name_id
-playlist_info = pd.DataFrame(playlist_name_id, columns = ["Name", "Owner", "Number_of_tracks", "Tracklist_id"]) # Set the column names for the playlist metadata
-playlist_info = playlist_info.set_index('Name')
-playlist_info.columns
-keyword = "Sing"
-[x for x in playlist_info.index if keyword in x]
-playlist_info
-playlist_name = "Discover Weekly Archive"
-
-
-#testPlaylist = playlist(playlist_info.loc[playlist_name].Tracklist_id, playlist_info.loc[playlist_name].Owner, sp)
-testPlaylist = playlist("37i9dQZF1DWWMOmoXKqHTD", "spotify", sp)
-
-
+testPlaylist = get_playlist("malchemist02", "Kanye West – The Life Of Pablo")
 
 ######## 05172018
 
 type(testPlaylist)
 dir(testPlaylist)
-# Get word frequency of top 200 words
-# testPlaylist.wordFrequency.shape
-# word_freq = testPlaylist.wordFrequency
-word_freq = testPlaylist.getWordCounts(300)
 
-
+# Get word frequency of top 300 words
+word_freq = testPlaylist.getWordCounts(100)
 
 word_freq_count = word_freq.sum(axis=0)
 word_freq_count = word_freq_count.sort_values(ascending=False)
@@ -100,15 +67,14 @@ top_words = word_freq_count.index.tolist()
 
 
 
-
-
 !pwd
 # glove_filepath = "/home/owner/Downloads/glove.6B.50d.txt"
-glove_filepath = "/home/malcolm/Downloads/glove.6B.50d.txt"
+glove_filepath = "/home/owner/Downloads/glove.6B.50d.txt"
 
 os.path.isfile(glove_filepath)
+embed_dict = get_word_embeddings(glove_filepath, top_words)
 
-
+"""
 cutoff = None # 400000 # max
 
 # Read in the embeddings from the top words list
@@ -124,15 +90,14 @@ with open(glove_filepath, 'r+', encoding='utf-8') as fp:
             print("Looked through ", i, " words")
         if i == cutoff: break
         if len(embed_dict) == len(top_words): break
-
+"""
 # Validate embeddings
 len(embed_dict)
 set(list(embed_dict)).symmetric_difference(top_words)
 #list(embed_dict.keys())
 
 # Turn embeddings into dictionary
-embed_pd = pd.DataFrame(embed_dict)
-embed_pd = embed_pd.T
+embed_pd = pd.DataFrame(embed_dict).T
 embed_pd.set_index(embed_pd.iloc[:,0], inplace = True)
 embed_pd.drop([0], axis = 1, inplace = True)
 embed_pd2 = embed_pd.apply(pd.to_numeric)
@@ -156,7 +121,7 @@ for word in embed_pd2.index:
 
 
 list(cosine_dict.keys())
-check_word = "girl"
+check_word = "night"
 check_word in embed_pd2.index
 cosine_dict[check_word][:10]
 
@@ -246,5 +211,31 @@ dir(LinearRegression)
 
 ########### Use a cosine similarity as dep var... compare performance
 song_cosine_dict.keys()
-dep_var2 = song_cosine_dict["All of Me"]
-dep_var2.join(...)
+dep_var2 = song_cosine_dict["30 Hours"]
+
+dep_var2.head()
+norm_song_embeds.head()
+
+# Create embedding dataframe
+dep_embedding = pd.concat([dep_var2, norm_song_embeds], axis = 1)
+dep_embedding.rename(columns = {0:"song_cosine"}, inplace = True)
+
+# Create words DataFrame
+dep_words = pd.concat([dep_var2, word_freq], axis = 1)
+dep_words.rename(columns = {0:"song_cosine"}, inplace = True)
+
+
+X_sc_em =  dep_embedding.drop(["song_cosine"], axis = 1)
+Y_sc_em = dep_embedding["song_cosine"]
+
+X_train, X_test, y_train, y_test = train_test_split(X_sc_em, Y_sc_em)
+
+fit1 = LinearRegression().fit(X_train, y_train)
+fit1.score(X_test, y_test)
+
+X_sc_nw =  dep_words.drop(["song_cosine"], axis = 1)
+Y_sc_nw = dep_words["song_cosine"]
+
+X_train, X_test, y_train, y_test = train_test_split(X_sc_nw, Y_sc_nw)
+fit1 = LinearRegression().fit(X_train, y_train)
+fit1.score(X_test, y_test)

@@ -7,7 +7,7 @@ import sys
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-%matplotlib inline
+# %matplotlib inline
 
 # Spotify API
 import spotipy
@@ -53,9 +53,13 @@ def get_playlist(username, playlist_name):
     playlist_info = pd.DataFrame(playlist_name_id, columns = ["Name", "Owner", "Number_of_tracks", "Tracklist_id"]) # Set the column names for the playlist metadata
     playlist_info = playlist_info.set_index('Name')
 
-    if playlist_name in playlist_info.index.values:
-        return(playlist_info.loc[playlist_name])
-    else:
+    # Error message if playlist name not in username playlist list
+    if playlist_name not in playlist_info.index.values:
         print("Playlist named: ", playlist_name, " not found. Playlist found: ")
         print(playlist_info)
-        return(-1)
+        raise ValueError("Playlist not in playlist list")
+
+    # Initialize a playlist
+    testPlaylist = playlist(playlist_info.loc[playlist_name].Tracklist_id, playlist_info.loc[playlist_name].Owner, sp)
+
+    return(testPlaylist)
