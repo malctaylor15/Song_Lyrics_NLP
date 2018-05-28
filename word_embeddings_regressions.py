@@ -29,6 +29,9 @@ import playlist
 reload(playlist)
 from playlist import playlist
 
+import utils_adv
+reload(utils_adv)
+from utils_adv import *
 
 from scipy.spatial.distance import cosine
 
@@ -66,11 +69,12 @@ top_words = word_freq_count.index.tolist()
 
 !pwd
 # glove_filepath = "/home/owner/Downloads/glove.6B.50d.txt"
-glove_filepath = "/home/malcolm/Downloads/glove.6B.50d.txt"
+glove_filepath = "/home/owner/Downloads/glove.6B.50d.txt"
 
 os.path.isfile(glove_filepath)
+embed_dict = get_word_embeddings(glove_filepath, top_words)
 
-
+"""
 cutoff = None # 400000 # max
 
 # Read in the embeddings from the top words list
@@ -86,15 +90,14 @@ with open(glove_filepath, 'r+', encoding='utf-8') as fp:
             print("Looked through ", i, " words")
         if i == cutoff: break
         if len(embed_dict) == len(top_words): break
-
+"""
 # Validate embeddings
 len(embed_dict)
 set(list(embed_dict)).symmetric_difference(top_words)
 #list(embed_dict.keys())
 
 # Turn embeddings into dictionary
-embed_pd = pd.DataFrame(embed_dict)
-embed_pd = embed_pd.T
+embed_pd = pd.DataFrame(embed_dict).T
 embed_pd.set_index(embed_pd.iloc[:,0], inplace = True)
 embed_pd.drop([0], axis = 1, inplace = True)
 embed_pd2 = embed_pd.apply(pd.to_numeric)
@@ -236,130 +239,3 @@ Y_sc_nw = dep_words["song_cosine"]
 X_train, X_test, y_train, y_test = train_test_split(X_sc_nw, Y_sc_nw)
 fit1 = LinearRegression().fit(X_train, y_train)
 fit1.score(X_test, y_test)
-
-## Naturally the embeddings perform better in this case because they were used
-# In a non linear fashion in creating the depednent
-
-####################
-### Begin Tsnee ####
-####################
-
-from sklearn.manifold import TSNE
-# norm_song_embeds.to_csv("EmbedsForPabloKanye.csv")
-
-y1 = [x for x in range(0,10)]
-y1[:3]
-
-new_embeds = TSNE(perplexity = 5, random_state=1).fit_transform(norm_song_embeds)
-new_embeds = pd.DataFrame(new_embeds, index = norm_song_embeds.index)
-plt.ioff()
-plt.scatter(new_embeds.iloc[:,0], new_embeds.iloc[:,1])
-
-for label, x, y in zip(norm_song_embeds.index.values, new_embeds.iloc[:,0], new_embeds.iloc[:,1]):
-    plt.annotate(label, xy = (x,y), xytext = (20,-20),
-    textcoords='offset points', ha='right', va='bottom',
-    bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
-    arrowprops=dict(arrowstyle = '->', connectionstyle='arc3,rad=0'))
-
-plt.show()
-
-
-
-from sklearn.cluster import KMeans
-
-n_cluster = 3
-
-cluster_fit = KMeans(n_clusters = n_cluster, random_state=2).fit(new_embeds)
-
-# Combine label and center
-unique_labels = np.sort(np.unique(cluster_fit.labels_))
-centers = cluster_fit.cluster_centers_
-cl_center_dict = {label:center for label, center in zip(unique_labels, centers)}
-
-# Initalize dict for storing distances
-# center_dist = {label: [] for label in cluster_fit.labels_}
-# TODO: make key of center dist a dataframe
-center_dist = {label: pd.DataFrame(columns = ["Distance"]) for label in cluster_fit.labels_}
-
-
-from scipy.spatial.distance import euclidean
-
-# take in pt, cluster center, song name
-for pt, cl_label,song_name in zip(new_embeds.values, cluster_fit.labels_, new_embeds.index.tolist()):
-
-    pt_center = cl_center_dict[cl_label]
-    dist_from_center = euclidean(pt, pt_center)
-    # center_dist[cl_label].append((song_name, dist_from_center))
-
-    center_dist[cl_label].loc[song_name]= dist_from_center
-
-numb_pts_to_label = 3 # Name top n farthest/closest points from their center
-pts_to_label = pd.DataFrame(columns = ["Distance", "Center"])
-for center_lbl in unique_labels:
-    top_pts_far = center_dist[center_lbl].sort_values(by="Distance", ascending = False)[:3]
-    top_pts_far["Center"] = center_lbl
-    top_pts_near = center_dist[center_lbl].sort_values(by="Distance", ascending = False)[:-3]
-
-    pts_to_label = pd.concat([pts_to_label, top_pts_far], axis = 0)
-type(top_pts_far)
-
-pts_to_label = pts_to_label.join(new_embeds)
-
-plt.scatter(centers[:,0], centers[:,1], color = "red")
-plt.scatter(new_embeds.iloc[:,0], new_embeds.iloc[:,1])
-
-for label, x, y in zip(pts_to_label.index.tolist(), pts_to_label[0], pts_to_label[1]):
-    plt.annotate(label, xy = (x,y), xytext = (20,-20),
-    textcoords='offset points', ha='right', va='bottom',
-    bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
-    arrowprops=dict(arrowstyle = '->', connectionstyle='arc3,rad=0'))
-
-plt.show()
-
-
-
-#################################
-#################################
-#################################
-
-
-# Name top n farthest/closest points from their center
-pts_to_label = pd.DataFrame(columns = ["Distance", "Close_Far", "Label"])
-for center_lbl in unique_labels:
-    sorted_pts = center_dist[center_lbl].sort_values(by="Distance", ascending = False)
-    # Points far away
-    top_pts_far = sorted_pts[:numb_pts_to_label]
-    top_pts_far["Close_Far"] = "F"
-    # Points closer
-    top_pts_near = sorted_pts[-numb_pts_to_label:]
-    top_pts_near.loc[:,"Close_Far"] = "C"
-    # Combine and add Label
-    pts = top_pts_far.append(top_pts_near).copy()
-    pts.loc[:,"Label"] = np.repeat(center_lbl, pts.shape[0])
-
-    pts_to_label = pd.concat([pts_to_label, pts], axis = 0)
-
-data = new_embeds
-pts_to_label = pts_to_label.join(data)
-
-for center, label in zip(centers, unique_labels):
-    # pts_to_label.loc["Center"+str(label)] = {"Distance":0, "Close_Far":"CC", "Label":label, 0:center}
-    temp_array = [0, "CC", label]
-    for x in center:
-        temp_array.append(x)
-    pts_to_label.loc["Center"+str(label)] = temp_array
-pts_to_label
-
-center_info
-unique_labels
-cluster_fit.cluster_centers_
-
-
-import utils_adv
-reload(utils_adv)
-from utils_adv import *
-
-
-df1 = find_outliers(new_embeds)
-
-plot_TSNE_all_labels(new_embeds, title="Life of Pablo TSNE Embeddings")

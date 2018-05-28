@@ -233,7 +233,7 @@ os.path.isfile(glove_filepath)
 
 
 cutoff = None # 400000 # max
-
+"""
 # Read in the embeddings from the top words list
 with open(glove_filepath, 'r+', encoding='utf-8') as fp:
     i = 0
@@ -247,7 +247,8 @@ with open(glove_filepath, 'r+', encoding='utf-8') as fp:
             print("Looked through ", i, " words")
         if i == cutoff: break
         if len(embed_dict) == len(top_words): break
-
+"""
+embed_dict = get_word_embeddings(glove_filepath, top_words)
 # Validate embeddings
 len(embed_dict)
 set(list(embed_dict)).symmetric_difference(top_words)

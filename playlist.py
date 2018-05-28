@@ -51,6 +51,7 @@ class playlist:
         self.sentimentList = [song.getSentiment() for song in self.listOfSongs]
         return(self.sentimentList)
 
+    """
     def buildWord2Vec(self, num_features = 50, context_size = 7, min_word_count = 4):
         downsampling = 1e-1
 
@@ -66,9 +67,13 @@ class playlist:
         self.songs2vec.train(corpus, total_examples = self.songs2vec.corpus_count
                 , epochs = self.songs2vec.iter)
 
+    """
 
     def getWordCounts(self, numb_words = 200):
         ### Bag of words functionalitys
+        """
+        Uses the lyrics for each song to find the top numb_words in the playlist
+        """
         self.songLyricsList = [song.lyrics for song in self.listOfSongs]
         self.songNames = [song.title for song in self.listOfSongs]
         #del songNames[0] delete later if not needed
@@ -76,12 +81,22 @@ class playlist:
         vect = CountVectorizer(max_features = numb_words)
         vectWordFreq = vect.fit_transform(self.songLyricsList).toarray()
         self.vectNames = vect.get_feature_names()
-        self.vectdf = pd.DataFrame(vectWordFreq,columns = self.vectNames, index=self.songNames)
-        return self.vectdf
+        self.wordFrequency = pd.DataFrame(vectWordFreq,columns = self.vectNames, index=self.songNames)
+        return self.wordFrequency
 
-    def getTfidf(self):
-        self.wordFrequency = self.getWordCounts() #copied from elswhere
+    def getTfidf(self, numb_words = 200):
+        if not hasattr(self, "wordFrequency"):
+            self.getWordCounts(numb_words)
         transformer = TfidfTransformer(smooth_idf=False)
         tfidf = transformer.fit_transform(self.wordFrequency.values)
         self.tfidf_df = pd.DataFrame(tfidf.toarray(),columns = self.vectNames, index=self.songNames)
         return self.tfidf_df
+
+    def getSongWordCounts(self, numb_words = 200):
+        """
+        Get the frequency of each word in each song
+        """
+        if not hasattr(self, "wordFrequency"):
+            self.getWordCounts(numb_words)
+        self.SongWordFrequency = self.wordFrequency.sum(axis=1).sort_values(ascending=False)
+        return(self.SongWordFrequency)
