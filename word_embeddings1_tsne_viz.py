@@ -154,12 +154,13 @@ y1[:3]
 
 new_embeds = TSNE(perplexity = 5, random_state=1).fit_transform(norm_song_embeds)
 new_embeds = pd.DataFrame(new_embeds, index = norm_song_embeds.index)
-plt.ioff()
+
 
 import utils_adv
 reload(utils_adv)
 from utils_adv import *
-%matplotlib inline
+plt.ioff()
+# %matplotlib inline
 
 # df1 = find_outliers(new_embeds, n_cluster = 2, numb_pts_to_label=1)
 
