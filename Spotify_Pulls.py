@@ -102,7 +102,7 @@ def get_tracklist_class(tracklist_id, username, sp):
         allTracks.append(song_temp)
         n +=1
         if n % 5 ==0: print("Finished ", n, " songs")
-    print("Completed getting tracks fro spotify")
+    print("Completed getting tracks from spotify")
     return allTracks
 
 def get_user_playlists_2(username, playlists):
@@ -126,9 +126,7 @@ def get_user_playlists_2(username, playlists):
     playlist_info = pd.DataFrame(all_playlist_info,
         columns = ["Name", "Number_of_Tracks", "Tracklist_id"])
 
-
-
-    return(playlist_info)
+        return(playlist_info)
 
 def get_user_playlists(username):
     print("Running get_user_playlists...")

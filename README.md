@@ -2,7 +2,7 @@
 
 In these scripts, we analyze playlists from spotify based on metrics from spotify and the lyrics of the songs. We are able to retrieve the lyrics from the website genius.com .
 
-Spotify is a music service that allows users to listen to music and create playlists to organize their songs. MOre information about spotify can be found [here](spotify.com) .
+Spotify is a music service that allows users to listen to music and create playlists to organize their songs. More information about spotify can be found [here](spotify.com) .
 
 Genius.com is a website dedicated to sharing music knowledge and has lyrics for many songs.
 
