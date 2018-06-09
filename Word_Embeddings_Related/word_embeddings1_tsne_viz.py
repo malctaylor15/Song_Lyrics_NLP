@@ -29,6 +29,7 @@ import playlist
 reload(playlist)
 from playlist import playlist
 
+sys.path.append("./Word_Embeddings_Related")
 import utils_adv
 reload(utils_adv)
 from utils_adv import *

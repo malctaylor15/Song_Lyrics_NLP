@@ -11,7 +11,7 @@ from sklearn.feature_extraction.text import TfidfTransformer
 
 import numpy as np
 import pandas as pd
-import song
+from song_class import song 
 import gensim.models.word2vec as w2v
 
 
