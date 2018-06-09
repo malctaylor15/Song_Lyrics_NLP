@@ -5,9 +5,6 @@ import GeniusAPI_MT
 reload(GeniusAPI_MT)
 from GeniusAPI_MT import *
 
-import Spotify_Pulls
-reload(Spotify_Pulls)
-from Spotify_Pulls import *
 
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
@@ -102,6 +99,43 @@ class playlist:
         return(self.SongWordFrequency)
 
 
+
+def get_tracklist(tracklist_id, username):
+    """
+    This function takes a spotify tracklist id and spotify username
+    and returns a dictionary where the track name is the key.
+    This function interacts with the Spotify API to find information
+    for each song of a track list
+
+    Inputs:
+        tracklist_id = Spotify tracklist id (string)
+        username = spotify username (string)
+
+    Output:
+        allTracks = dictionary with song artist and track name
+
+    """
+    print("Running get_tracklist...")
+    allTracks = {}
+    results = sp.user_playlist(username, tracklist_id, fields="tracks")
+    tracks = results['tracks']
+    print("There are ", len(tracks["items"]), " in playlist")
+    n = 0
+    print("There are ", len(tracks['items']), " items in the playlist")
+    for i, item in enumerate(tracks['items']):
+        track = item['track']
+        trackName = track['name']
+        trackArtist = track['artists'][0]['name']
+        allTracks[trackName] = trackArtist
+        n +=1
+        if n % 5 ==0: print("Finished ", n, " songs")
+    pp(allTracks)
+    return allTracks
+
+
+
+
+
 def get_tracklist_class(tracklist_id, username, sp):
     """
     This function takes a spotify tracklist and spotify username
@@ -156,3 +190,35 @@ def get_user_playlists_2(username, playlists):
         columns = ["Name", "Number_of_Tracks", "Tracklist_id"])
 
     return(playlist_info)
+
+
+
+
+def get_tracklist_lyrics(tracklist):
+    """
+    This function takes a list of song (class) and returns a string of
+    the concatentated lyrics for all songs in playlist (list of songs).
+
+    Input:
+        tracklist = list of songs
+
+    Output:
+        lyrics = concatenated lyrics
+    """
+    print("Running get_tracklist_lyrics...")
+    lyrics = str()
+    for song in tracklist:
+        if song.lyrics != ():
+            lyrics = lyrics + song.lyrics
+    return(lyrics)
+
+def get_user_playlists(username):
+    print("Running get_user_playlists...")
+    for playlist in playlists['items']:
+        if playlist['owner']['id'] == username:
+            print()
+            print(playlist['name'])
+            print('  total tracks', playlist['tracks']['total'])
+            results = sp.user_playlist(username, playlist['id'],
+                fields="tracks,next")
+            tracks = results['tracks']
