@@ -169,13 +169,13 @@ plt.ioff()
 fig, ax = plt.subplots()
 plot_TSNE_all_labels(ax, new_embeds)
 fig.show()
-fig.savefig("TSNE_Plots/Life of Pablo All pts Labeled.png")
+fig.savefig("../TSNE_Plots/Life of Pablo All pts Labeled.png")
 
 fig, ax = plt.subplots()
 df1 = find_outliers(new_embeds)
 plot_TSNE_cluster_overlay(ax, new_embeds, df1)
 fig.show()
-fig.savefig("TSNE_Plots/Life of Pablo Cluster pts.png")
+fig.savefig("../TSNE_Plots/Life of Pablo Cluster pts.png")
 
 
 tsnes = plot_4_TSNE(norm_song_embeds)

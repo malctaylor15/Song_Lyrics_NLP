@@ -11,12 +11,12 @@ from sklearn.feature_extraction.text import TfidfTransformer
 
 import numpy as np
 import pandas as pd
-from song_class import song 
+from song_class import song
 import gensim.models.word2vec as w2v
 
 
 class playlist:
-    def __init__(self, tracklist_id, username, sp):
+    def __init__(self, tracklist_id, username, sp, n_tracks = 100):
         """
         Playlists are defined by a unique spotify playlist id and username
 
@@ -26,7 +26,7 @@ class playlist:
         #print("Instantiating a playlist...")
         self.username = username
         self.tracklist_id = tracklist_id
-        self.listOfSongs = get_tracklist_class(self.tracklist_id, self.username, sp)
+        self.listOfSongs = get_tracklist_class(self.tracklist_id, self.username, sp, n_tracks)
         self.allLyrics = get_tracklist_lyrics(self.listOfSongs)
         self.songNames = [song.title for song in self.listOfSongs]
 
@@ -99,9 +99,9 @@ class playlist:
         return(self.SongWordFrequency)
 
 
-
+"""
 def get_tracklist(tracklist_id, username):
-    """
+
     This function takes a spotify tracklist id and spotify username
     and returns a dictionary where the track name is the key.
     This function interacts with the Spotify API to find information
@@ -114,7 +114,7 @@ def get_tracklist(tracklist_id, username):
     Output:
         allTracks = dictionary with song artist and track name
 
-    """
+
     print("Running get_tracklist...")
     allTracks = {}
     results = sp.user_playlist(username, tracklist_id, fields="tracks")
@@ -132,11 +132,11 @@ def get_tracklist(tracklist_id, username):
     pp(allTracks)
     return allTracks
 
+"""
 
 
 
-
-def get_tracklist_class(tracklist_id, username, sp):
+def get_tracklist_class(tracklist_id, username, sp, n_track):
     """
     This function takes a spotify tracklist and spotify username
     and returns a list of the song class.
@@ -164,6 +164,7 @@ def get_tracklist_class(tracklist_id, username, sp):
         allTracks.append(song_temp)
         n +=1
         if n % 5 ==0: print("Finished ", n, " songs")
+        if n % n_track: break
     print("Completed getting tracks from spotify")
     return allTracks
 
@@ -212,6 +213,7 @@ def get_tracklist_lyrics(tracklist):
             lyrics = lyrics + song.lyrics
     return(lyrics)
 
+"""
 def get_user_playlists(username):
     print("Running get_user_playlists...")
     for playlist in playlists['items']:
@@ -222,3 +224,4 @@ def get_user_playlists(username):
             results = sp.user_playlist(username, playlist['id'],
                 fields="tracks,next")
             tracks = results['tracks']
+"""

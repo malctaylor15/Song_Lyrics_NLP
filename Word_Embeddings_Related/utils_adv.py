@@ -163,10 +163,10 @@ def plot_TSNE_cluster_overlay(ax, embeddings, cluster_info, title_start = "TSNE 
 
 
 
-def plot_4_TSNE(data, random_states = [1,2,3,4], perplexity_input = 5, title = "MultiTSNE_labeled.png"):
+def plot_4_TSNE(data, random_states = [1,2,3,4], perplexity_input = 5, title = "MultiTSNE_labeled.png", path = ""):
 
     """
-    Plot multiple TSNE
+    Plot multiple TSNE with all points labeled 
 
     """
     # Create 4 TSNE Embeddings
@@ -186,17 +186,20 @@ def plot_4_TSNE(data, random_states = [1,2,3,4], perplexity_input = 5, title = "
         plot_TSNE_all_labels(ax, tsne)
 
     print("Finished plotting all TSNEs")
-
-    f.savefig(title)
+    if path =="":
+        f.savefig(title)
+    else:
+        save_filename = path+"/"+title
+        f.savefig(save_file_name)
     debug_dict = {"TSNEs": TSNEs, "figure": f}
     return(debug_dict)
 
 
 
-def plot_4_TSNE_w_overlay(data, random_states = [1,2,3,4], perplexity_input = 5, n_cluster = 2, pts_to_label = 2, fig_size= (10,10), title = "Multi TSNE_clusters.png"):
+def plot_4_TSNE_w_overlay(data, random_states = [1,2,3,4], perplexity_input = 5, n_cluster = 2, pts_to_label = 2, fig_size= (10,10), title = "Multi TSNE_clusters.png", path = ""):
 
     """
-    Plot multiple TSNE
+    Plot multiple TSNE with the cluster overlays
 
     """
     # Create 4 TSNE Embeddings
@@ -223,7 +226,11 @@ def plot_4_TSNE_w_overlay(data, random_states = [1,2,3,4], perplexity_input = 5,
     # plt.tight_layout()
     print("Created outlier image")
 
-    f.savefig(title)
+    if path =="":
+        f.savefig(title)
+    else:
+        save_filename = path+"/"+title
+        f.savefig(save_file_name)
     # Debug outputs
     debug_dict = {"TSNEs": TSNEs, "outlier_df": outlier_dfs, "figure":f, "axs":axs}
     return(debug_dict)

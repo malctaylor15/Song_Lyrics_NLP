@@ -9,6 +9,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 %matplotlib inline
 
+sys.path
+
 # Spotify API
 import spotipy
 import spotipy.util as util
@@ -29,14 +31,18 @@ import Spotify_Pulls
 reload(Spotify_Pulls)
 from Spotify_Pulls import *
 
-import song
-reload(song)
-from song import song
+import song_class
+reload(song_class)
+from song_class import song
 
 import playlist
 reload(playlist)
 from playlist import playlist
 
+sys.path.append("./Word_Embeddings_Related")
+import utils_adv
+reload(utils_adv)
+from utils_adv import *
 
 # Get user playlist information from spotify
 #username = 'malchemist02'  #TODO: Make user input
@@ -82,7 +88,11 @@ playlist_name = "Discover Weekly Archive"
 ### END Create dataframe of playlists for the user ###
 #[playlist(playlist_info.loc[playlist_name].Tracklist_id, playlist_info.loc[playlist_name].Owner, sp) for ]
 #testPlaylist = playlist(playlist_info.loc[playlist_name].Tracklist_id, playlist_info.loc[playlist_name].Owner, sp)
-testPlaylist = playlist("37i9dQZF1DWWMOmoXKqHTD", "spotify", sp)
+testPlaylist = playlist("37i9dQZF1DWWMOmoXKqHTD", "spotify", sp, 5)
+
+
+type(testPlaylist.listOfSongs[0])
+
 
 ### 20180301 ###
 # Combine multiple playlist?
@@ -228,7 +238,11 @@ top_words = word_freq_count.index.tolist()
 
 
 !pwd
-glove_filepath = "/home/owner/Downloads/glove.6B.50d.txt"
+if "drose" in os.getcwd():
+    glove_filepath = r"C:\Users\drose\OneDrive - University of New Haven\Downloads\glove.6B.50d.txt"
+else:
+    glove_filepath = "/home/owner/Downloads/glove.6B.50d.txt"
+
 os.path.isfile(glove_filepath)
 
 
