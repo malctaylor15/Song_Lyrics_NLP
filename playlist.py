@@ -1,4 +1,3 @@
-from wordcloud import WordCloud
 from textblob import TextBlob
 
 from importlib import reload
@@ -35,6 +34,7 @@ class playlist:
         self.songNames = [song.title for song in self.listOfSongs]
 
     def showWordCloud(self):
+        from wordcloud import WordCloud
         self.wc = WordCloud().generate(self.allLyrics)
         self.wc.to_image().show()
 

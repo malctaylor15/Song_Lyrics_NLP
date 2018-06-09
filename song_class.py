@@ -1,5 +1,4 @@
 
-from wordcloud import WordCloud
 from textblob import TextBlob
 
 from importlib import reload
@@ -44,6 +43,7 @@ class song:
         """
         Uses the lyrics to create a WordCloud image and object
         """
+        from wordcloud import WordCloud
         if self.lyrics == ():
             print("No lyrics found")
             return ()

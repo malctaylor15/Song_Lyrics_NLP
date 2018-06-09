@@ -33,7 +33,7 @@ import GeniusAPI_MT
 reload(GeniusAPI_MT)
 from GeniusAPI_MT import *
 
-from song import *
+from song_class import song
 
 import pandas as pd
 
@@ -126,7 +126,7 @@ def get_user_playlists_2(username, playlists):
     playlist_info = pd.DataFrame(all_playlist_info,
         columns = ["Name", "Number_of_Tracks", "Tracklist_id"])
 
-        return(playlist_info)
+    return(playlist_info)
 
 def get_user_playlists(username):
     print("Running get_user_playlists...")

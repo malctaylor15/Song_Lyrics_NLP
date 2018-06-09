@@ -25,9 +25,9 @@ import Spotify_Pulls
 reload(Spotify_Pulls)
 from Spotify_Pulls import *
 
-import song
-reload(song)
-from song import song
+import song_class
+reload(song_class)
+from song_class import song
 
 import playlist
 reload(playlist)
