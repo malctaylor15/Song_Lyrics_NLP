@@ -1,30 +1,26 @@
 # System utilities
-import os
-from os import environ
-import subprocess
-import sys
 
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 %matplotlib inline
 
+from importlib import reload
+
+import numpy as np
 # Spotify API
 import spotipy
 import spotipy.util as util
 
-from importlib import reload
 import GeniusAPI_MT
+
 reload(GeniusAPI_MT)
-from GeniusAPI_MT import *
 
-import Spotify_Pulls
-reload(Spotify_Pulls)
-from Spotify_Pulls import *
+import playlist
 
-import song
-reload(song)
-from song import song
+reload(playlist)
+from playlist import *
+
+import song_class
+
+reload(song_class)
 
 import playlist
 reload(playlist)
@@ -67,7 +63,7 @@ df2.mean(axis = 0)
 
 
 import statsmodels.formula.api as sm
-import statsmodels.regression.linear_model as sm2
+
 
 def create_formula(dep_var_name, colList):
     all_columns = "+ ".join([col for col in colList if col != dep_var_name])

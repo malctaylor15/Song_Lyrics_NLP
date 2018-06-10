@@ -1,17 +1,8 @@
 # System utilities
-import os
-from os import environ
-import subprocess
-import sys
 
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 %matplotlib inline
 
 # Spotify API
-import spotipy
-import spotipy.util as util
 #nltk.download("stopwords")
 #nltk.download("wordnet")
 #nltk.download("punkt")
@@ -21,13 +12,13 @@ import spotipy.util as util
 
 from importlib import reload
 
-import get_playlist
+from Word_Embeddings_Related import get_playlist
+
 reload(get_playlist)
-from get_playlist import get_playlist
+from Word_Embeddings_Related.get_playlist import get_playlist
 
 import playlist
 reload(playlist)
-from playlist import playlist
 
 import utils_adv
 reload(utils_adv)
@@ -65,9 +56,7 @@ word_freq.shape
 # word_freq_count.head()
 top_words = word_freq_count.index.tolist()
 
-
-
-!pwd
+os.getcwd()
 # glove_filepath = "/home/owner/Downloads/glove.6B.50d.txt"
 glove_filepath = "/home/owner/Downloads/glove.6B.50d.txt"
 
