@@ -163,8 +163,8 @@ def get_tracklist_class(tracklist_id, username, sp, n_track):
         song_temp = song(track['name'], track['artists'][0]['name'], sp = sp, spotify_id = track['id'])
         allTracks.append(song_temp)
         n +=1
-        if n % 5 ==0: print("Finished ", n, " songs")
-        if n % n_track: break
+        if n % 5 == 0: print("Finished ", n, " songs")
+        if n % n_track == 0: break
     print("Completed getting tracks from spotify")
     return allTracks
 
