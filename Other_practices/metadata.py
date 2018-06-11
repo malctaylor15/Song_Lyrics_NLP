@@ -9,9 +9,9 @@ import numpy as np
 import spotipy
 import spotipy.util as util
 
-import GeniusAPI_MT
+import genius_api
 
-reload(GeniusAPI_MT)
+reload(genius_api)
 
 import playlist
 

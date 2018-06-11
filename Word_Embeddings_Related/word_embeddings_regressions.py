@@ -57,8 +57,10 @@ word_freq.shape
 top_words = word_freq_count.index.tolist()
 
 os.getcwd()
-# glove_filepath = "/home/owner/Downloads/glove.6B.50d.txt"
-glove_filepath = "/home/owner/Downloads/glove.6B.50d.txt"
+if "drose" in os.getcwd():
+    glove_filepath = r"C:\Users\drose\OneDrive - University of New Haven\Downloads\glove.6B.50d.txt"
+else:
+    glove_filepath = "/home/owner/Downloads/glove.6B.50d.txt"
 
 os.path.isfile(glove_filepath)
 embed_dict = get_word_embeddings(glove_filepath, top_words)

@@ -2,9 +2,9 @@
 from textblob import TextBlob
 
 from importlib import reload
-import GeniusAPI_MT
-reload(GeniusAPI_MT)
-from GeniusAPI_MT import *
+import genius_api
+reload(genius_api)
+from genius_api import *
 
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
@@ -30,8 +30,10 @@ class song:
             spotify_id = kwargs["spotify_id"]
             #print("Found ", title, " by ", artist, ". It has a spotify id")
 
-            self.audioFeatures = sp.audio_features(spotify_id)[0]
-
+            try:
+                self.audioFeatures = sp.audio_features(spotify_id)[0]
+            except:
+                print(f"EXCEPTION {self.title} was not found in Spotify, perhaps it does not have an artist or is otherwise no longer available on the platform.\n\n")
 
 
         if self.lyrics == ():

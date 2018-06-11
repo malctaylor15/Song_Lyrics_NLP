@@ -8,14 +8,14 @@ from importlib import reload
 import spotipy
 import spotipy.util as util
 
-import GeniusAPI_MT
+import genius_api
 
 # nltk.download("stopwords")
 # nltk.download("wordnet")
 # nltk.download("punkt")
 # Word embeddings
 # https://nlp.stanford.edu/projects/glove/
-reload(GeniusAPI_MT)
+reload(genius_api)
 
 import playlist
 

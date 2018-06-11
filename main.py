@@ -17,35 +17,32 @@ import spotipy.util as util
 
 
 from importlib import reload
-import GeniusAPI_MT
 
-reload(GeniusAPI_MT)
+import genius_api
+reload(genius_api)
+from genius_api import *
 
 import playlist
-
 reload(playlist)
 from playlist import *
 
 import song_class
-
 reload(song_class)
 from song_class import song
 
 import playlist
-
 reload(playlist)
 from playlist import playlist
 
 sys.path.append("./Word_Embeddings_Related")
 import utils_adv
-
 reload(utils_adv)
 from utils_adv import *
 
 # Get user playlist information from spotify
-# username = 'malchemist02'  #TODO: Make user input
+#username = 'malchemist02'  #TODO: Make user input
 username = "1282829978"
-scope = 'user-library-read playlist-read-private user-top-read'  # the permissions to give our application
+scope = 'playlist-read-private playlist-read-collaborative'  # the permissions to give our application
 token = util.prompt_for_user_token(username, scope)
 sp = spotipy.Spotify(auth=token)
 
@@ -72,6 +69,7 @@ print("Test Song Polarity: %s" % testSong.polarity) # Prints same result as getS
 # playlists = sp.category_playlists('hiphop') # For using the genre playlists from spotify
 playlists = sp.user_playlists(username)  # Returns list of playlists & metadata for the provided user
 # Now has list with name and id
+playlists
 playlist_name_id = [(key['name'], key['owner']['id'], key['tracks']['total'], key['id']) \
                     for key in playlists['items']]  # Extract the metadata for each song of the playlist
 playlist_name_id
@@ -81,16 +79,18 @@ playlist_info = playlist_info.set_index('Name')
 playlist_info.columns
 keyword = "Sing"
 [x for x in playlist_info.index if keyword in x]
-playlist_info
 playlist_name = "Discover Weekly Archive"
+test_playlist_id = playlist_info.loc[playlist_name]["Tracklist_id"]
+test_playlist_owner = playlist_info.loc[playlist_name]["Owner"]
 
 ### END Create dataframe of playlists for the user ###
 # [playlist(playlist_info.loc[playlist_name].Tracklist_id, playlist_info.loc[playlist_name].Owner, sp) for ]
 # testPlaylist = playlist(playlist_info.loc[playlist_name].Tracklist_id, playlist_info.loc[playlist_name].Owner, sp)
-testPlaylist = playlist("37i9dQZF1DWWMOmoXKqHTD", "spotify", sp, 5)
+#testPlaylist = playlist(playlist_name, test_playlist_id, test_playlist_owner, sp, 100)
+testPlaylist = playlist("Long Playlist", "5fMCrRnSy4TauAmM36zrIP", "random guy", sp, 100)
 
-type(testPlaylist.listOfSongs[0])
-
+#type(testPlaylist.listOfSongs[0])
+testPlaylist.listOfSongs
 ### Playlist analysis ###
 playlist_metadata = [(song.title, song.artist, len(song.lyrics.split()), song.getSentiment()) for song in
                      testPlaylist.listOfSongs]

@@ -4,7 +4,7 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-%matplotlib inline
+#%matplotlib inline
 
 # Spotify API
 #nltk.download("stopwords")
@@ -57,8 +57,10 @@ word_freq.shape
 top_words = word_freq_count.index.tolist()
 
 os.getcwd()
-# glove_filepath = "/home/owner/Downloads/glove.6B.50d.txt"
-glove_filepath = "/home/malcolm/Downloads/glove.6B.50d.txt"
+if "drose" in os.getcwd():
+    glove_filepath = r"C:\Users\drose\OneDrive - University of New Haven\Downloads\glove.6B.50d.txt"
+else:
+    glove_filepath = "/home/owner/Downloads/glove.6B.50d.txt"
 
 os.path.isfile(glove_filepath)
 
@@ -75,7 +77,7 @@ with open(glove_filepath, 'r+', encoding='utf-8') as fp:
             embed_dict[split_line[0]] = split_line[0:]
         i +=1
         if i % 4000 ==0 :
-            print("Looked through ", i, " words")
+            print(f"Looked through {i} words")
         if i == cutoff: break
         if len(embed_dict) == len(top_words): break
 
