@@ -92,14 +92,13 @@ testPlaylist = playlist("Long Playlist", "5fMCrRnSy4TauAmM36zrIP", "random guy",
 #type(testPlaylist.listOfSongs[0])
 testPlaylist.listOfSongs
 ### Playlist analysis ###
-playlist_metadata = [(song.title, song.artist, len(song.lyrics.split()), song.getSentiment()) for song in
-                     testPlaylist.listOfSongs]
+playlist_metadata = [(song.title, song.artist, len(song.lyrics.split()), song.getSentiment()) for song in testPlaylist.listOfSongs]
 # Reformat the playlist metadata as a list of items to be turned to a dataframe in the next lineplaylist_metadata
 playlist_metadata_df = pd.DataFrame(playlist_metadata, columns=["Title", "Artist", "numb_words",
                                                                 "Sentiment"])  # Creating dataframe from running the song class on each song of the playlist given
 playlist_metadata_df.sort_values("Sentiment", ascending=False)
 good_songs = playlist_metadata_df[playlist_metadata_df.Sentiment != 0]  # Filters out songs w/o sentiment
-good_songs
+pp(good_songs)
 
 # Number songs dropped
 len(playlist_metadata) - len(good_songs)
@@ -193,7 +192,7 @@ word_freq = testPlaylist.wordFrequency
 word_freq_count = word_freq.sum(axis=0)
 word_freq_count = word_freq_count.sort_values(ascending=False)
 
-song_freq_count = word_freq.sum(axis=1)
+song_freq_count = pd.Series(word_freq.sum(axis=1), name="song_freq_count")
 song_freq_count = song_freq_count.sort_values(ascending=False)
 
 # Drop songs with no words
@@ -284,7 +283,21 @@ song_freq_count.shape
 song_embeds.shape
 
 # Normalize embededdings -- some songs have more words than others
-norm_song_embeds = song_embeds.divide(song_freq_count2, axis=0)
+#songs_embeds_SONGS = pd.Series(song_embeds.index)
+#song_freq_count2_SONGS = pd.Series(song_freq_count2.index)
+#song_freq_count_SONGS = pd.Series(song_freq_count.index)
+#songs_embeds_SONGS == song_freq_count2_SONGS
+song_embeds.shape
+song_freq_count2.shape
+song_freq_count2[list(song_embeds.index)].shape
+song_embeds3.shape = song_embeds.join(song_freq_count2,how='inner')
+pd.concat((song_embeds, song_freq_count2.T), axis=1, join='inner')
+#song_embeds3 = song_embeds3.drop(["song_freq_count"], axis=1)
+try:
+    norm_song_embeds = song_embeds.divide(song_freq_count2, axis=0)
+except Exception as e:
+    print(e)
+
 
 norm_song_embeds.head()
 

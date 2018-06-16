@@ -109,7 +109,10 @@ class playlist:
 
 def get_tracklist_class_iteration(results, tracklist_id, username, sp, n_tracks, songs_completed):
     global songs_searched_this_round
-    tracks = results['items']
+    try:
+        tracks = results['items']
+    except TypeError:
+        pass
     iteration_tracks = []
     n = 0
 
@@ -185,14 +188,14 @@ def get_tracklist_class(tracklist_name, tracklist_id, username, sp, n_tracks):
 
     z = 0 # for testing
     #print(tracklist_name)
-    while next != '':
-
+    while next != None:
         if songs_searched_this_round > 5:
             print("Saving completed tracks to pickle file \n\n\n")
             print("len(all_tracks: " + str(len(all_tracks)))
             save_object(all_tracks, f"{tracklist_name}.pkl")
             songs_searched_this_round = 0
         print(f"Starting {next} now...\n")
+
         next_results = sp.next(next_results)
         iteration_tracks, songs_completed = get_tracklist_class_iteration(results=next_results,tracklist_id=tracklist_id, username=username, sp=sp, n_tracks=n_tracks, songs_completed=songs_completed)
         all_tracks.extend(iteration_tracks)
@@ -200,7 +203,7 @@ def get_tracklist_class(tracklist_name, tracklist_id, username, sp, n_tracks):
         print(f"songs_searched_this_round {songs_searched_this_round}")
 
         z = z+1     # for testing
-        if z == 20:  # for testing, set z to the number of iterations you want done
+        if z == 16:  # for testing, set z to the number of iterations you want done
             break   # for testing
 
     print("Completed getting tracks from spotify")
