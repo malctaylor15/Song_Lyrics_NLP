@@ -2,32 +2,26 @@
 
 # Count number of times a word shows up in a playlists
 # System utilities
-import os
-from os import environ
-import subprocess
-import sys
 
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-%matplotlib inline
+# %matplotlib inline
+
+from importlib import reload
 
 # Spotify API
 import spotipy
 import spotipy.util as util
 
-from importlib import reload
-import GeniusAPI_MT
-reload(GeniusAPI_MT)
-from GeniusAPI_MT import *
+import genius_api
 
-import Spotify_Pulls
-reload(Spotify_Pulls)
-from Spotify_Pulls import *
+reload(genius_api)
+
+import playlist
+
+reload(playlist)
+from playlist import *
 
 import song_class
 reload(song_class)
-from song_class import song
 
 import playlist
 reload(playlist)

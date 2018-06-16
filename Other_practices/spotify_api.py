@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 # Set environment variables
 os.environ['SPOTIPY_CLIENT_ID'] = "d3c68e4eb95942fb9a0ceb508d62c127"
 os.environ['SPOTIPY_CLIENT_SECRET'] = "bab6935eaa2f478ea4c47a6c8a96eec8"
-os.environ['SPOTIPY_REDIRECT_URI'] = "http://localhost/"
+os.environ['SPOTIPY_REDIRECT_URI'] = "http://example.com/callback/"
 
 
 #username = 'malchemist02'  #TODO: Make user input

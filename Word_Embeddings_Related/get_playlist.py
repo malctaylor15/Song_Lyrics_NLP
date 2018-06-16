@@ -1,37 +1,29 @@
 # System utilities
-import os
-from os import environ
-import subprocess
-import sys
 
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 # %matplotlib inline
+
+from importlib import reload
 
 # Spotify API
 import spotipy
 import spotipy.util as util
-#nltk.download("stopwords")
-#nltk.download("wordnet")
-#nltk.download("punkt")
 
+import genius_api
+
+# nltk.download("stopwords")
+# nltk.download("wordnet")
+# nltk.download("punkt")
 # Word embeddings
 # https://nlp.stanford.edu/projects/glove/
+reload(genius_api)
 
+import playlist
 
-from importlib import reload
-import GeniusAPI_MT
-reload(GeniusAPI_MT)
-from GeniusAPI_MT import *
-
-import Spotify_Pulls
-reload(Spotify_Pulls)
-from Spotify_Pulls import *
+reload(playlist)
+from playlist import *
 
 import song_class
 reload(song_class)
-from song_class import song
 
 import playlist
 reload(playlist)

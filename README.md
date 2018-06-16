@@ -19,7 +19,7 @@ Some of this aggregation is found in the Spotify_Pull.py script.  We are able to
 
 Genius.com also has an API which we can call to retrieve information about a specific song. Unfortunately the API does not give direct access to the lyrics to the song. Instead the API has information about the song title, artist and a link to the genius page. We scrape the lyrics from the genius site using the python package BeautifulSoup4.
 
-The GeniusAPI_MT.py script and lyrics_from_song_api_path function has more details about how to scrape the lyrics.
+The genius_api.py script and lyrics_from_song_api_path function has more details about how to scrape the lyrics.
 
 
 ### Word Embeddings vs Word Frequency

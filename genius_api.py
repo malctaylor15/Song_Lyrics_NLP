@@ -1,15 +1,15 @@
 # coding: utf-8
-#test android change
+
 import requests #web commands module
-import re #regular expressions module
+#import re #regular expressions module
 
 import nltk # Natural language processing
 from nltk.tokenize import RegexpTokenizer # Regex handler
 from nltk.corpus import stopwords # Commonly used words
 from nltk.stem.wordnet import WordNetLemmatizer # Convert words into root form
-from nltk.stem.porter import PorterStemmer # Strip suffixes from words
+#from nltk.stem.porter import PorterStemmer # Strip suffixes from words
 
-from pprint import pprint as pp #pretty printing module
+#from pprint import pprint as pp #pretty printing module
 from bs4 import BeautifulSoup #web parser module
 
 headers = {'Authorization':'Bearer 8shOdDguRJG7nghujt_1_0HI7Y552WYNWOTbG5a-JAXax6SUVv1Ab4xR55eTwukL'}
@@ -78,6 +78,7 @@ def get_song_lyrics(artist_name, song_title, headers):
 
     #pp(resp['response']['hits'])
     for hit in resp['response']['hits']:
+        #print(hit["result"]) # for testing
         if hit["result"]["primary_artist"]["name"] == artist_name:
             song_info = hit
             break
@@ -87,7 +88,7 @@ def get_song_lyrics(artist_name, song_title, headers):
         cleaned_lyrics = text_cleaner(formatted_lyrics)
         return(cleaned_lyrics)
     else:
-        print(song_title,"by", artist_name, "not found in Genius.")
+        print(f"\t{artist_name}'s {song_title} not in Genius.")
         return(' ')
 
 #test_lyrics = get_song_lyrics(artist_name="Kendrick Lamar", song_title="HUMBLE.", headers=headers)
