@@ -17,17 +17,17 @@ import genius_api
 # https://nlp.stanford.edu/projects/glove/
 reload(genius_api)
 
-import playlist
+import playlist_class
 
-reload(playlist)
-from playlist import *
+reload(playlist_class)
+from playlist_class import *
 
 import song_class
 reload(song_class)
 
-import playlist
-reload(playlist)
-from playlist import playlist
+import playlist_class
+reload(playlist_class)
+from playlist_class import playlist
 
 
 def get_playlist(username, playlist_name):
@@ -52,6 +52,6 @@ def get_playlist(username, playlist_name):
         raise ValueError("Playlist not in playlist list")
 
     # Initialize a playlist
-    testPlaylist = playlist(playlist_info.loc[playlist_name].Tracklist_id, playlist_info.loc[playlist_name].Owner, sp)
+    testPlaylist = playlist_class(playlist_info.loc[playlist_name].Tracklist_id, playlist_info.loc[playlist_name].Owner, sp)
 
     return(testPlaylist)

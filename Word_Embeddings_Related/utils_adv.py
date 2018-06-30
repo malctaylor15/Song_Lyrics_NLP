@@ -14,7 +14,7 @@ import os
 
 
 # Read in the embeddings from the top words list
-def get_word_embeddings(glove_path, words, output_freq = 10000, cutoff = None):
+def get_word_embeddings(glove_path, words, output_freq = 50000, cutoff = None):
     """
     Look in embeddings file and get the matching embeddings
 
@@ -40,7 +40,7 @@ def get_word_embeddings(glove_path, words, output_freq = 10000, cutoff = None):
             if split_line[0] in words:
                 embed_dict[split_line[0]] = split_line[0:]
             i +=1
-            if i % output_freq ==0 :
+            if i % output_freq == 0:
                 print("Looked through ", i, " words")
             if i == cutoff: break
             if len(embed_dict) == len(words): break
