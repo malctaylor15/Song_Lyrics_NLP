@@ -18,8 +18,8 @@ from Word_Embeddings_Related import get_playlist
 reload(get_playlist)
 from Word_Embeddings_Related.get_playlist import get_playlist
 
-import playlist
-reload(playlist)
+import playlist_class
+reload(playlist_class)
 
 sys.path.append("./Word_Embeddings_Related")
 import utils_adv
@@ -38,21 +38,21 @@ type(testPlaylist)
 dir(testPlaylist)
 
 # Get word frequency of top 300 words
-word_freq = testPlaylist.getWordCounts(100)
+words_songs_freqs = testPlaylist.getWordCounts(100)
 
-word_freq_count = word_freq.sum(axis=0)
+word_freq_count = words_songs_freqs.sum(axis=0)
 word_freq_count = word_freq_count.sort_values(ascending=False)
 
-song_freq_count = word_freq.sum(axis=1)
+song_freq_count = words_songs_freqs.sum(axis=1)
 song_freq_count = song_freq_count.sort_values(ascending=False)
 
 # Drop songs with no words
-word_freq = word_freq.drop([x[0] for x in song_freq_count.iteritems() if x[1] == 0],axis = 0)
+words_songs_freqs = words_songs_freqs.drop([x[0] for x in song_freq_count.iteritems() if x[1] == 0],axis = 0)
 song_freq_count2 = song_freq_count[song_freq_count != 0]
 len(song_freq_count2)
 song_freq_count.shape
-word_freq.shape
-# word_freq
+words_songs_freqs.shape
+# words_songs_freqs
 
 # song_freq_count.head()
 # word_freq_count.head()
@@ -105,10 +105,10 @@ cosine_dict[check_word][:10]
 
 embed_pd2.shape
 embed_pd2.head()
-word_freq.shape
-word_match_freq = word_freq.drop([col for col in word_freq.columns \
+words_songs_freqs.shape
+word_match_freq = words_songs_freqs.drop([col for col in words_songs_freqs.columns \
 if col not in list(embed_dict.keys())],axis = 1)
-word_freq.head()
+words_songs_freqs.head()
 song_embeds = word_match_freq.dot(embed_pd2)
 song_embeds.head()
 song_embeds

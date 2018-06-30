@@ -15,17 +15,17 @@ import genius_api
 
 reload(genius_api)
 
-import playlist
+import playlist_class
 
-reload(playlist)
-from playlist import *
+reload(playlist_class)
+from playlist_class import *
 
 import song_class
 reload(song_class)
 
-import playlist
-reload(playlist)
-from playlist import playlist
+import playlist_class
+reload(playlist_class)
+from playlist_class import playlist
 
 # Get user playlist information from spotify
 username = 'malchemist02'  #TODO: Make user input
@@ -48,13 +48,13 @@ testPlaylist = playlist(playlist_info.loc[playlist_name].Tracklist_id, playlist_
 
 [song.title for song in testPlaylist.listOfSongs]
 
-testPlaylist.getWordCounts(numb_words = 3)
+testPlaylist.getWordCounts(min_word_rank = 3)
 
 # All count for each word
 allLyrics1 = testPlaylist.allLyrics
 splitLyrics = allLyrics1.split()
-word_freq = {word:splitLyrics.count(word) for word in set(splitLyrics)}
-[(word, word_freq[word]) for word in sorted(word_freq, key=word_freq.get, reverse=False)]
+words_songs_freqs = {word:splitLyrics.count(word) for word in set(splitLyrics)}
+[(word, words_songs_freqs[word]) for word in sorted(words_songs_freqs, key=words_songs_freqs.get, reverse=False)]
 
 
  # Search for word and find count

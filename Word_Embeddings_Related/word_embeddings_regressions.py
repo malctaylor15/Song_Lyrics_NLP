@@ -17,8 +17,8 @@ from Word_Embeddings_Related import get_playlist
 reload(get_playlist)
 from Word_Embeddings_Related.get_playlist import get_playlist
 
-import playlist
-reload(playlist)
+import playlist_class
+reload(playlist_class)
 
 import utils_adv
 reload(utils_adv)
@@ -36,21 +36,21 @@ type(testPlaylist)
 dir(testPlaylist)
 
 # Get word frequency of top 300 words
-word_freq = testPlaylist.getWordCounts(100)
+words_songs_freqs = testPlaylist.getWordCounts(100)
 
-word_freq_count = word_freq.sum(axis=0)
+word_freq_count = words_songs_freqs.sum(axis=0)
 word_freq_count = word_freq_count.sort_values(ascending=False)
 
-song_freq_count = word_freq.sum(axis=1)
+song_freq_count = words_songs_freqs.sum(axis=1)
 song_freq_count = song_freq_count.sort_values(ascending=False)
 
 # Drop songs with no words
-word_freq = word_freq.drop([x[0] for x in song_freq_count.iteritems() if x[1] == 0],axis = 0)
+words_songs_freqs = words_songs_freqs.drop([x[0] for x in song_freq_count.iteritems() if x[1] == 0],axis = 0)
 song_freq_count2 = song_freq_count[song_freq_count != 0]
 len(song_freq_count2)
 song_freq_count.shape
-word_freq.shape
-# word_freq
+words_songs_freqs.shape
+# words_songs_freqs
 
 # song_freq_count.head()
 # word_freq_count.head()
@@ -120,10 +120,10 @@ cosine_dict[check_word][:10]
 
 embed_pd2.shape
 embed_pd2.head()
-word_freq.shape
-word_match_freq = word_freq.drop([col for col in word_freq.columns \
+words_songs_freqs.shape
+word_match_freq = words_songs_freqs.drop([col for col in words_songs_freqs.columns \
 if col not in list(embed_dict.keys())],axis = 1)
-word_freq.head()
+words_songs_freqs.head()
 song_embeds = word_match_freq.dot(embed_pd2)
 song_embeds.head()
 song_embeds
@@ -156,9 +156,9 @@ dir(testPlaylist)
 
 ### Get sentiment as response variable ###
 playlist_metadata = [(song.title, song.artist, len(song.lyrics.split()), song.getSentiment()) for song in testPlaylist.listOfSongs ]
-playlist_metadata_df = pd.DataFrame(playlist_metadata, columns = ["Title", "Artist", "numb_words" ,"Sentiment"]) # Creating dataframe from running the song class on each song of the playlist given
+playlist_metadata_df = pd.DataFrame(playlist_metadata, columns = ["Title", "Artist", "min_word_rank" ,"Sentiment"]) # Creating dataframe from running the song class on each song of the playlist given
 playlist_metadata_df.sort_values("Sentiment", ascending = False)
-playlist_metadata_df = playlist_metadata_df[playlist_metadata_df.numb_words > 0]
+playlist_metadata_df = playlist_metadata_df[playlist_metadata_df.min_word_rank > 0]
 playlist_metadata_df.set_index("Title", inplace = True)
 playlist_metadata_df.shape
 playlist_metadata_df.sort_values("Sentiment", ascending = False).head()
@@ -171,7 +171,7 @@ embeding_model_df1.drop(["Artist"], axis = 1, inplace = True)
 embeding_model_df1.shape
 
 ### Word freq df
-freq_model_df1 = playlist_metadata_df.join(word_freq)
+freq_model_df1 = playlist_metadata_df.join(words_songs_freqs)
 freq_model_df1.drop(["Artist"], axis = 1, inplace = True)
 freq_model_df1.shape # Includes sentiment and # of words
 freq_model_df1.head()
@@ -212,7 +212,7 @@ dep_embedding = pd.concat([dep_var2, norm_song_embeds], axis = 1)
 dep_embedding.rename(columns = {0:"song_cosine"}, inplace = True)
 
 # Create words DataFrame
-dep_words = pd.concat([dep_var2, word_freq], axis = 1)
+dep_words = pd.concat([dep_var2, words_songs_freqs], axis = 1)
 dep_words.rename(columns = {0:"song_cosine"}, inplace = True)
 
 

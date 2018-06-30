@@ -14,14 +14,19 @@ import pandas as pd
 
 
 class song:
-    def __init__(self, title, artist, **kwargs):
+    def __init__(self, title: object, artist: object, **kwargs) -> object:
         """
         Creates a song object using the title and artist for a song
         This will get the lyrics and create TextBlob object
+        :param title: The song's title
+        :param artist: The song's artist
+        :param kwargs: Optional parameters
+        :rtype: object
         """
-        #print("Instantiating a song...") # For testing
+
         self.title = title
         self.artist = artist
+        self.title_and_artist = title + "_" + artist
         self.lyrics = get_song_lyrics(self.artist, self.title, headers = headers)
         keywords_for_spotifyid = ["spotify_id", "sp"]
 

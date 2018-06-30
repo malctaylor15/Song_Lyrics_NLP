@@ -1,0 +1,9 @@
+textblob
+pandas
+scikit-learn
+spotipy
+nltk
+numpy
+matplotlib
+requests
+beautifulsoup4

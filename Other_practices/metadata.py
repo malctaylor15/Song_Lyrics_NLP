@@ -13,18 +13,18 @@ import genius_api
 
 reload(genius_api)
 
-import playlist
+import playlist_class
 
-reload(playlist)
-from playlist import *
+reload(playlist_class)
+from playlist_class import *
 
 import song_class
 
 reload(song_class)
 
-import playlist
-reload(playlist)
-from playlist import playlist
+import playlist_class
+reload(playlist_class)
+from playlist_class import playlist
 
 
 # Get user playlist information from spotify
@@ -76,7 +76,7 @@ result = sm.ols(formula=dance_formula, data=df2).fit()
 result.summary()
 
 ##
-word_counts = testPlaylist.getWordCounts(numb_words= 30)
+word_counts = testPlaylist.getWordCounts(min_word_rank= 30)
 word_counts.sum(axis = 1)
 word_counts.sum(axis = 0).sort_values(ascending = False)
 
