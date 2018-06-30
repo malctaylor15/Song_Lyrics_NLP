@@ -15,7 +15,6 @@ import spotipy.util as util
 # Word embeddings
 # https://nlp.stanford.edu/projects/glove/
 
-
 from importlib import reload
 
 import genius_api
@@ -151,12 +150,11 @@ songLyricsNonEmpty
 lyrics1 = ''
 for lyrics in songLyricsNonEmpty:
     lyrics1 = lyrics1 + " " + lyrics  # Combine the lyrics of all the songs into one string
-lyrics1
+
 len(lyrics1)
 len(nltk.word_tokenize(lyrics1))
 demoLyrics = list(set(nltk.word_tokenize(lyrics1)))
 demoLyrics.sort()
-demoLyrics
 
 songLyricsNonEmpty = [lyrics1 + lyrics for lyrics in songLyricsNonEmpty]
 songLyricsNonEmpty
