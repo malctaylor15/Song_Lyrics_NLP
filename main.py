@@ -1,16 +1,13 @@
 # System utilities
 import sys
 
-# %matplotlib inline
-
-sys.path
 
 # Spotify API
 import spotipy
 import spotipy.util as util
-# nltk.download("stopwords")
-# nltk.download("wordnet")
-# nltk.download("punkt")
+nltk.download("stopwords")
+nltk.download("wordnet")
+nltk.download("punkt")
 
 # Word embeddings
 # https://nlp.stanford.edu/projects/glove/
