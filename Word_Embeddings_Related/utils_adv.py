@@ -13,39 +13,39 @@ from scipy.spatial.distance import euclidean
 import os
 
 
-# Read in the embeddings from the top words list
-def get_word_embeddings(glove_path, words, output_freq = 50000, cutoff = None):
-    """
-    Look in embeddings file and get the matching embeddings
-
-    For each line in the file path, split on spaces and see if the word
-    is in the words list
-
-    Inputs:
-        glove_path (str): path to embeddings
-        words (list): list of words to retrieve from embeddings file
-        output_freq (int) : number of words to alert after going through embeddings file
-        cutoff (int): how many lines in embeddings to look through (debugging)
-    Output:
-        embed_dict (dict): keys are word name, value is list of the embeddings
-    """
-
-    if not os.path.isfile(glove_path): raise ValueError("Glove file not found: path={}".format(glove_path))
-
-    with open(glove_path, 'r+', encoding='utf-8') as fp:
-        i = 0
-        embed_dict = {}
-        for line in fp:
-            split_line = line.split()
-            if split_line[0] in words:
-                embed_dict[split_line[0]] = split_line[0:]
-            i +=1
-            if i % output_freq == 0:
-                print("Looked through ", i, " words")
-            if i == cutoff: break
-            if len(embed_dict) == len(words): break
-
-    return(embed_dict)
+# # Read in the embeddings from the top words list
+# def get_word_embeddings(glove_path, words, output_freq = 50000, cutoff = None):
+#     """
+#     Look in embeddings file and get the matching embeddings
+#
+#     For each line in the file path, split on spaces and see if the word
+#     is in the words list
+#
+#     Inputs:
+#         glove_path (str): path to embeddings
+#         words (list): list of words to retrieve from embeddings file
+#         output_freq (int) : number of words to alert after going through embeddings file
+#         cutoff (int): how many lines in embeddings to look through (debugging)
+#     Output:
+#         embed_dict (dict): keys are word name, value is list of the embeddings
+#     """
+#
+#     if not os.path.isfile(glove_path): raise ValueError("Glove file not found: path={}".format(glove_path))
+#
+#     with open(glove_path, 'r+', encoding='utf-8') as fp:
+#         i = 0
+#         embed_dict = {}
+#         for line in fp:
+#             split_line = line.split()
+#             if split_line[0] in words:
+#                 embed_dict[split_line[0]] = split_line[0:]
+#             i +=1
+#             if i % output_freq == 0:
+#                 print("Looked through ", i, " words")
+#             if i == cutoff: break
+#             if len(embed_dict) == len(words): break
+#
+#     return(embed_dict)
 
 
 

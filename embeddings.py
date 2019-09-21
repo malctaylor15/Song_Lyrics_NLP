@@ -2,8 +2,51 @@ import pandas as pd
 import os
 from importlib import reload
 import utils_adv
-reload(utils_adv)
-from utils_adv import *
+import pandas as pd
+import os
+import pickle
+from scipy.spatial.distance import cosine
+
+
+# reload(utils_adv)
+# from utils_adv import *
+
+
+# Read in the embeddings from the top words list
+def get_word_embeddings(glove_path, words, output_freq = 50000, cutoff = None):
+    """
+    Look in embeddings file and get the matching embeddings
+
+    For each line in the file path, split on spaces and see if the word
+    is in the words list
+
+    Inputs:
+        glove_path (str): path to embeddings
+        words (list): list of words to retrieve from embeddings file
+        output_freq (int) : number of words to alert after going through embeddings file
+        cutoff (int): how many lines in embeddings to look through (debugging)
+    Output:
+        embed_dict (dict): keys are word name, value is list of the embeddings
+    """
+
+    if not os.path.isfile(glove_path): raise ValueError("Glove file not found: path={}".format(glove_path))
+
+    with open(glove_path, 'r+', encoding='utf-8') as fp:
+        i = 0
+        embed_dict = {}
+        for line in fp:
+            split_line = line.split()
+            if split_line[0] in words:
+                embed_dict[split_line[0]] = split_line[0:]
+            i +=1
+            if i % output_freq == 0:
+                print("Looked through ", i, " words")
+            if i == cutoff: break
+            if len(embed_dict) == len(words): break
+
+    return(embed_dict)
+
+
 
 def get_embeddings(playlist):
     # Get dataframe of all 'songs by words' IF the word appears in the top 200 ranked words
@@ -84,3 +127,25 @@ def get_embeddings(playlist):
         print(e)
     print("Completed get_embeddings")
     return norm_song_embeds
+
+def create_cosine_matrix(norm_song_embeds):
+
+    counter = 0
+    song_cosine_dict = {}
+    for song in norm_song_embeds.index: # The 50 subset if just for testing 20180616
+        embed_check = norm_song_embeds.loc[song]
+        temp_single_cosine_list = norm_song_embeds.apply(lambda x: 1 - cosine(x, embed_check), axis=1)
+        song_cosine_dict[song] = temp_single_cosine_list.sort_values(ascending=False)
+        counter += 1
+        if counter % 100 == 0:
+            print(f"100 done!\n counter is now {counter}")
+
+
+    pd_cosine_matrix = pd.concat(song_cosine_dict, axis=1)
+    pd_cosine_matrix.to_csv('checkpoints/Cosine_matrix.csv')
+
+    print("Saved cosine matrix")
+    print("Cosine matrix is size: ", pd_cosine_matrix.shape)
+    #TODO: Make the file name a variable based on the playlist title
+    return pd_cosine_matrix
+

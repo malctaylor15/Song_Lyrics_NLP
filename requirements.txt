@@ -7,3 +7,5 @@ numpy
 matplotlib
 requests
 beautifulsoup4
+dash
+lightgbm

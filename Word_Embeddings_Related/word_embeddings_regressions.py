@@ -1,6 +1,6 @@
 # System utilities
 
-%matplotlib inline
+# %matplotlib inline
 
 # Spotify API
 #nltk.download("stopwords")
@@ -25,6 +25,7 @@ reload(utils_adv)
 from utils_adv import *
 
 from scipy.spatial.distance import cosine
+from embeddings import get_word_embeddings
 
 
 # Get user playlist information from spotify

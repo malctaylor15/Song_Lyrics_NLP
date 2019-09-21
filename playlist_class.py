@@ -165,13 +165,15 @@ def get_tracklist_class(tracklist_name, tracklist_id, username, sp, n_tracks):
 
     print("Running get_tracklist_class (getting all the tracks for the specified playlist)...")
     all_tracks = []
+    inp_name =  input("What is the pkl file name?")
     for pkl in glob(os.getcwd()+"/*.pkl"):
-        if input("What is the pkl file name?") in pkl:
+        if inp_name in pkl:
+            print("Using pkl: ", pkl)
             with open(f'{tracklist_name}.pkl', 'rb') as input2:
                 listOfSongs = pickle.load(input2)
-
-
             all_tracks = listOfSongs
+        else:
+            print("No pkl found")
     try:
         prev_completed_songs = {(song.title + song.artist) for song in listOfSongs}
     except:
@@ -212,7 +214,7 @@ def get_tracklist_class(tracklist_name, tracklist_id, username, sp, n_tracks):
 
     print("Completed getting tracks from spotify")
 
-    len(listOfSongs)
+    # len(listOfSongs)
     #for sung in listOfSongs:
     print(songs_searched_this_round)
     len(all_tracks)
