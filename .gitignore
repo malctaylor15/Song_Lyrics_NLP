@@ -4,3 +4,8 @@ songlyric_env/
 __pycache__/
 .ipynb_checkpoints/
 credentials.pkl
+cfg_files/
+checkpoints
+data_checkpoints
+bert
+OLDER
