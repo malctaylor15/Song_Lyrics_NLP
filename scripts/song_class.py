@@ -1,10 +1,12 @@
 
+import os
 from textblob import TextBlob
-
+import pickle
+import spotipy
 from importlib import reload
-import genius_api
-reload(genius_api)
-from genius_api import *
+import scripts.genius_api as genius
+
+from spotipy.oauth2 import SpotifyClientCredentials
 
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
@@ -13,8 +15,18 @@ import numpy as np
 import pandas as pd
 
 
+with open("../cfg_files/genius_header.pkl", 'rb') as hnd:
+    genius_headers = pickle.load(hnd)
+
+with open("../cfg_files/spotify_credentials.pkl", "rb") as hnd:
+    spotify_credentials = pickle.load(hnd)
+
+os.environ["SPOTIPY_CLIENT_ID"] = spotify_credentials["SPOTIPY_CLIENT_ID"]
+os.environ["SPOTIPY_CLIENT_SECRET"] = spotify_credentials["SPOTIPY_CLIENT_SECRET"]
+os.environ["SPOTIPY_REDIRECT_URI"] = spotify_credentials["SPOTIPY_REDIRECT_URI"]
+
 class song:
-    def __init__(self, title: object, artist: object, **kwargs) -> object:
+    def __init__(self, title: str, artist: str, spotify_id:str, **kwargs) -> object:
         """
         Creates a song object using the title and artist for a song
         This will get the lyrics and create TextBlob object
@@ -27,38 +39,40 @@ class song:
         self.title = title
         self.artist = artist
         self.title_and_artist = title + "_" + artist
-        self.raw_lyrics = get_song_lyrics(self.artist, self.title, headers = headers)
-        self.lyrics = text_cleaner(self.raw_lyrics)
-        keywords_for_spotifyid = ["spotify_id", "sp"]
+        self.spotify_id = spotify_id
 
-        if all([x in kwargs.keys() for x in keywords_for_spotifyid]):
-            sp = kwargs["sp"]
-            spotify_id = kwargs["spotify_id"]
-            #print("Found ", title, " by ", artist, ". It has a spotify id")
+    def execute(self):
+        self.get_genius_lyrics()
+        self.get_spotify_audio_features()
+        self.get_WordCounts()
+        self.get_Sentiment()
+        self.summarize()
+
+    def get_genius_lyrics(self):
+        self.raw_lyrics = genius.get_song_lyrics(self.artist, self.title, headers = genius_headers)
+        self.lyrics = genius.text_cleaner(self.raw_lyrics)
+        self.blob = TextBlob(self.lyrics)
+
+    def get_spotify_audio_features(self):
+        if (self.spotify_id != None):
+
+            client_credentials_manager = SpotifyClientCredentials(client_id=spotify_credentials['SPOTIPY_CLIENT_ID']
+                                                                  , client_secret=spotify_credentials['SPOTIPY_CLIENT_SECRET'])
+
+            token = client_credentials_manager.get_access_token()
+            sp = spotipy.Spotify(auth=token)
+
+            audio_feats_keep = ['danceability', 'energy', 'key', 'loudness', 'mode', 'speechiness', 'acousticness'
+                , 'instrumentalness', 'liveness', 'valence', 'tempo', 'duration_ms', 'time_signature']
 
             try:
-                self.audioFeatures = sp.audio_features(spotify_id)[0]
+                feats = sp.audio_features(self.spotify_id)[0]
+                self.audioFeatures = {k:v for k, v in feats.items() if k in audio_feats_keep}
             except:
-                print(f"EXCEPTION {self.title} was not found in Spotify, perhaps it does not have an artist or is otherwise no longer available on the platform.\n\n")
+                print("Was not able to find audio features for spotify id: "+ self.spotify_id)
+                self.audioFeatures = {k: -999 for k in audio_feats_keep}
 
-
-        if self.lyrics == ():
-            print("No lyrics found. Not creating TextBlob Object")
-        else:
-            self.blob = TextBlob(self.lyrics) #initialize the object for TextBlob
-
-    def showWordCloud(self):
-        """
-        Uses the lyrics to create a WordCloud image and object
-        """
-        from wordcloud import WordCloud
-        if self.lyrics == ():
-            print("No lyrics found")
-            return ()
-        self.wc = WordCloud().generate(self.lyrics)
-        self.wc.to_image().show()
-
-    def getSentiment(self, trace = 0):
+    def get_Sentiment(self, trace = 0):
         """
         This function uses the lyrics of a song to find the polarity
         using the lyrics as a TextBlob object
@@ -74,7 +88,7 @@ class song:
             print("Polarity is ", self.polarity)
         return(self.polarity)
 
-    def getWordCounts(self):
+    def get_WordCounts(self):
         """
         Counts the number of times a word is in a song
         """
@@ -83,13 +97,38 @@ class song:
         vocab = vectorizer.get_feature_names()
 
         word_counts = pd.Series(feats, index = vocab).T.sort_values(ascending = False)
-
+        self.word_counts = word_counts
         return(word_counts)
 
+    def show_WordCloud(self):
+        """
+        Uses the lyrics to create a WordCloud image and object
+        """
+        from wordcloud import WordCloud
+        if self.lyrics == ():
+            print("No lyrics found")
+            return ()
+        self.wc = WordCloud().generate(self.lyrics)
+        self.wc.to_image().show()
 
+    def get_embeddings(self):
+        pass
 
-    def getTags(self):
-        print(self.blob.tags)
+    def summarize(self, print = False):
+        all_details = {}
+        # Basics
+        all_details["title"] = self.title
+        all_details["artist"] = self.artist
+        all_details["title_and_artist"] = self.title + "_" + self.artist
+        all_details["spotify_id"] = self.spotify_id
+        # Lyrics
+        all_details["raw_lyrics"] = self.raw_lyrics
+        all_details["lyrics"] = self.lyrics
+        # Other
+        all_details["word_counts"] = self.word_counts.to_dict()
+        all_details.update(self.audioFeatures)
+        all_details["polarity"] = self.polarity
 
-    def getNouns(self):
-        print(self.blob.noun_phrases)
+        self.all_details = all_details.copy()
+        if print == True:
+            print("keys in self.all_details dict are: ", all_details.keys())

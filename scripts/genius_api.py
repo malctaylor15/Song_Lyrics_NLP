@@ -12,22 +12,17 @@ from nltk.stem.wordnet import WordNetLemmatizer # Convert words into root form
 #from pprint import pprint as pp #pretty printing module
 from bs4 import BeautifulSoup #web parser module
 
-headers = {'Authorization':'Bearer 8shOdDguRJG7nghujt_1_0HI7Y552WYNWOTbG5a-JAXax6SUVv1Ab4xR55eTwukL'}
 
-def lyrics_from_song_api_path(song_api_path, headers):
+def get_lyrics_from_genius_page(path):
     """
     This function extracts the lyrics from genius.com using Beautiful Soup
     """
-    #print("Running lyrics_from_song_api_path()...") # For Testing
-    base_url = 'https://api.genius.com'
-    song_url = base_url + song_api_path
-    # Query genius for lyrics
-    resp  = requests.get(song_url, headers=headers)
-    json = resp.json()
-    # Find lyrics url, query url
-    path = json['response']['song']['path']
+
     page_url = "http://genius.com" + path
     page = requests.get(page_url)
+    if (page.status_code < 200) or (page.status_code >= 300):
+        print("Debug: Could not find page for " + page_url)
+        return None
     # Use Beautiful soup to get lyrics text
     html = BeautifulSoup(page.text, 'html.parser')
     [h.extract() for h in html('script')]
@@ -46,9 +41,6 @@ def text_cleaner(text):
     tokens = tokenizer.tokenize(text)
     filtered_words = [lem.lemmatize(w) for w in tokens if not w in stopwords.words('english')]
     return " ".join(filtered_words)
-
-
-
 
 def get_song_lyrics(artist_name, song_title, headers):
     """
@@ -74,21 +66,37 @@ def get_song_lyrics(artist_name, song_title, headers):
     resp = requests.get(search_url, params=params, headers=headers)
     resp = resp.json()
     #pp(resp)
-    song_info = None
+    lyrics_path = None
 
     #pp(resp['response']['hits'])
     for hit in resp['response']['hits']:
         #print(hit["result"]) # for testing
-        if hit["result"]["primary_artist"]["name"] == artist_name:
-            song_info = hit
+        if hit["result"]["primary_artist"]["name"].lower() == artist_name.lower():
+            lyrics_path = hit['path']
             break
-    if song_info:
-        song_api_path = song_info['result']['api_path']
-        formatted_lyrics = lyrics_from_song_api_path(song_api_path, headers)
-        return(formatted_lyrics)
+
+    if lyrics_path == None:
+        # print('No hit found in genius api.. trying custom lookup link')
+        lyrics_path = create_fake_link(artist_name, song_title)
+
+    genius_lyrics = get_lyrics_from_genius_page(lyrics_path)
+    if genius_lyrics != None:
+        return(genius_lyrics)
     else:
         print(f"\t{artist_name}'s {song_title} not in Genius.")
         return(' ')
 
 #test_lyrics = get_song_lyrics(artist_name="Kendrick Lamar", song_title="HUMBLE.", headers=headers)
-#print(test_lyrics)
+#print(test_lyrics
+
+def quick_clean_str(string):
+    string = string.replace('.', '')
+    string = string.replace(' ', '-')
+    return(string)
+
+def create_fake_link(artist, title):
+    artist_clean = quick_clean_str(artist)
+    artist_clean = artist_clean.capitalize()
+    title_clean = quick_clean_str(title).lower()
+    link = '/'+artist_clean+'-'+title_clean+'-lyrics'
+    return(link)

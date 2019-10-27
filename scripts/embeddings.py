@@ -6,7 +6,7 @@ import pandas as pd
 import os
 import pickle
 from scipy.spatial.distance import cosine
-
+from flair.data import Sentence
 
 # reload(utils_adv)
 # from utils_adv import *
@@ -146,4 +146,21 @@ def create_cosine_matrix(norm_song_embeds):
     print("Cosine matrix is size: ", pd_cosine_matrix.shape)
     #TODO: Make the file name a variable based on the playlist title
     return pd_cosine_matrix
+
+def get_flair_bert_embeddings(words):
+
+    # Experimental -- not tested
+
+    from flair.embeddings import BertEmbeddings
+
+
+    bert_embedding = BertEmbeddings('bert-base-multilingual-cased')
+
+    sentence = Sentence(words)
+    bert_embedding.embed(sentence)
+
+    return(sentence)
+
+
+
 
