@@ -1,5 +1,6 @@
 
 import os
+import sqlite3
 from textblob import TextBlob
 import pickle
 import spotipy
@@ -16,14 +17,18 @@ import pandas as pd
 
 
 with open("../cfg_files/genius_header.pkl", 'rb') as hnd:
+    # Contains dictionary with Authorization and bearer + token
     genius_headers = pickle.load(hnd)
 
 with open("../cfg_files/spotify_credentials.pkl", "rb") as hnd:
+    # Contains dictionary with SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET and SPOTIPY_REDIRECT_URI
     spotify_credentials = pickle.load(hnd)
 
 os.environ["SPOTIPY_CLIENT_ID"] = spotify_credentials["SPOTIPY_CLIENT_ID"]
 os.environ["SPOTIPY_CLIENT_SECRET"] = spotify_credentials["SPOTIPY_CLIENT_SECRET"]
 os.environ["SPOTIPY_REDIRECT_URI"] = spotify_credentials["SPOTIPY_REDIRECT_URI"]
+
+database_location = '../checkpoints/songs.db'
 
 class song:
     def __init__(self, title: str, artist: str, spotify_id:str, **kwargs) -> object:
@@ -132,3 +137,18 @@ class song:
         self.all_details = all_details.copy()
         if print == True:
             print("keys in self.all_details dict are: ", all_details.keys())
+
+    def update_dictionary(self):
+        # Open connection
+        conn = sqlite3.connect(database_location)
+        c = conn.cursor()
+        # Get data wanted for database
+        keys_for_db = ['spotify_id', 'title', 'artist', 'raw_lyrics', 'danceability', 'energy', 'key' \
+            , 'loudness', 'mode', 'speechiness', 'acousticness', 'instrumentalness' \
+            , 'liveness', 'valence', 'tempo', 'duration_ms', 'time_signature']
+        data_row = [v for k, v in self.all_details.items() if k in keys_for_db]
+        c.execute("INSERT INTO songs values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", data_row)
+
+        # Save and close
+        conn.commit()
+        conn.close()
